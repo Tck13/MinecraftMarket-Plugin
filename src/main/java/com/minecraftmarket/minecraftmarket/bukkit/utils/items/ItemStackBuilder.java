@@ -22,6 +22,7 @@ public class ItemStackBuilder {
     }
 
     public ItemStackBuilder withName(String name) {
+        if (itemStack.getType() == Material.AIR) return this;
         final ItemMeta meta = itemStack.getItemMeta();
         meta.setDisplayName(Colors.color(name));
         itemStack.setItemMeta(meta);
@@ -29,6 +30,7 @@ public class ItemStackBuilder {
     }
 
     public ItemStackBuilder withLore(String name) {
+        if (itemStack.getType() == Material.AIR) return this;
         final ItemMeta meta = itemStack.getItemMeta();
         List<String> lore = meta.getLore();
         if (lore == null) {
@@ -41,6 +43,7 @@ public class ItemStackBuilder {
     }
 
     public List<String> getLore() {
+        if (itemStack.getType() == Material.AIR) return new ArrayList<>();
         final ItemMeta meta = itemStack.getItemMeta();
         List<String> lore = meta.getLore();
         if (lore == null) {
@@ -50,6 +53,7 @@ public class ItemStackBuilder {
     }
 
     public ItemStackBuilder withItemFlag(ItemFlag flag) {
+        if (itemStack.getType() == Material.AIR) return this;
         final ItemMeta meta = itemStack.getItemMeta();
         meta.addItemFlags(flag);
         itemStack.setItemMeta(meta);
@@ -57,26 +61,31 @@ public class ItemStackBuilder {
     }
 
     public ItemStackBuilder withAmount(int amount) {
+        if (itemStack.getType() == Material.AIR) return this;
         itemStack.setAmount(amount);
         return this;
     }
 
     public ItemStackBuilder withDurability(int durability) {
+        if (itemStack.getType() == Material.AIR) return this;
         itemStack.setDurability((short) durability);
         return this;
     }
 
     public ItemStackBuilder withData(int data) {
+        if (itemStack.getType() == Material.AIR) return this;
         itemStack.setDurability((short) data);
         return this;
     }
 
-    public ItemStackBuilder withEnchantment(Enchantment enchantment, final int level) {
+    public ItemStackBuilder withEnchantment(Enchantment enchantment, int level) {
+        if (itemStack.getType() == Material.AIR) return this;
         itemStack.addUnsafeEnchantment(enchantment, level);
         return this;
     }
 
     public ItemStackBuilder withEnchantment(Enchantment enchantment) {
+        if (itemStack.getType() == Material.AIR) return this;
         itemStack.addUnsafeEnchantment(enchantment, 1);
         return this;
     }
@@ -89,6 +98,7 @@ public class ItemStackBuilder {
     }
 
     public ItemStackBuilder clearLore() {
+        if (itemStack.getType() == Material.AIR) return this;
         final ItemMeta meta = itemStack.getItemMeta();
         meta.setLore(new ArrayList<>());
         itemStack.setItemMeta(meta);
@@ -96,6 +106,7 @@ public class ItemStackBuilder {
     }
 
     public ItemStackBuilder clearEnchantments() {
+        if (itemStack.getType() == Material.AIR) return this;
         for (Enchantment enchantment : itemStack.getEnchantments().keySet()) {
             itemStack.removeEnchantment(enchantment);
         }
