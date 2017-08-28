@@ -71,7 +71,7 @@ public class InventoryManager {
 
                     for (int pos = (45 * i) - 45; pos < categories.size() && pos < 45 * i; pos++) {
                         MCMarketApi.Category category = categories.get(pos);
-                        inventory.addItem(createCategoryInv(category, null), (player, slot, item, clickType) -> {
+                        inventory.addItem(createCategoryInv(category, null), (player, slot, item) -> {
                             inventories.get(category.getId() + "|1").open((Player) player);
                             return true;
                         });
@@ -98,7 +98,7 @@ public class InventoryManager {
                     }
                 }
 
-                inventory.setItem(49, closeItem, (player, slot, item, clickType) -> {
+                inventory.setItem(49, closeItem, (player, slot, item) -> {
                     player.closeInventory();
                     return true;
                 });
@@ -134,7 +134,7 @@ public class InventoryManager {
                 if (category.getSubCategories().size() > 0 && pos < Utils.roundUp(category.getSubCategories().size(), 9)) {
                     if (pos < category.getSubCategories().size()) {
                         MCMarketApi.Category subCategory = category.getSubCategories().get(pos);
-                        inventory.addItem(createCategoryInv(subCategory, category.getId() + "|" + i), (player, slot, item, clickType) -> {
+                        inventory.addItem(createCategoryInv(subCategory, category.getId() + "|" + i), (player, slot, item) -> {
                             inventories.get(subCategory.getId() + "|1").open((Player) player);
                             return true;
                         });
@@ -157,7 +157,7 @@ public class InventoryManager {
                     }
                 }
 
-                inventory.setItem(pos, itemIcon.build(), (player, slot, itemStack, clickType) -> {
+                inventory.setItem(pos, itemIcon.build(), (player, slot, itemStack) -> {
                     player.closeInventory();
                     player.sendMessage(Colors.color(I18n.tl("prefix") + " " + I18n.tl("gui_item_url", item.getUrl())));
                     return true;
@@ -178,7 +178,7 @@ public class InventoryManager {
                 }
             }
 
-            inventory.setItem(49, backItem, (player, slot, item, clickType) -> {
+            inventory.setItem(49, backItem, (player, slot, item) -> {
                 if (parent != null) {
                     inventories.get(parent).open(player);
                 } else {

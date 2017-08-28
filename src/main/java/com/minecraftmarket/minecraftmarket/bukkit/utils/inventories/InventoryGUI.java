@@ -6,9 +6,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.ClickType;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.*;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
@@ -97,7 +95,25 @@ public class InventoryGUI {
                         e.setCancelled(true);
                     }
                     if (current.items.containsKey(e.getSlot())) {
-                        e.setCancelled(current.items.get(e.getSlot()).onClick((Player) e.getWhoClicked(), e.getSlot(), e.getCurrentItem(), e.getClick()));
+                        e.setCancelled(current.items.get(e.getSlot()).onClick((Player) e.getWhoClicked(), e.getSlot(), e.getCurrentItem()));
+                    }
+                }
+            }
+
+            @EventHandler
+            public void onInventoryDragEvent(InventoryDragEvent e) {
+                if (inventories.containsKey(e.getInventory())) {
+                    InventoryGUI current = inventories.get(e.getInventory());
+                    if (current.cancelClick) {
+                        e.setCancelled(true);
+                    }
+                    for (int slot : e.getRawSlots()) {
+                        if (current.items.containsKey(slot)) {
+                            if (current.items.get(slot).onClick((Player) e.getWhoClicked(), slot, e.getCursor())) {
+                                e.setCancelled(true);
+                                break;
+                            }
+                        }
                     }
                 }
             }
@@ -129,6 +145,6 @@ public class InventoryGUI {
     }
 
     public interface ItemClick {
-        boolean onClick(Player player, int slot, ItemStack item, ClickType clickType);
+        boolean onClick(Player player, int slot, ItemStack item);
     }
 }
