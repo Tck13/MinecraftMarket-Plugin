@@ -112,7 +112,10 @@ public abstract class MCMarketApi {
     }
 
     protected String buildQueryFromFilter(Filter filter) {
-        return "&" + filter.getName() + "=" + filter.getValue();
+        if (filter != null) {
+            return "&" + filter.getName() + "=" + filter.getValue();
+        }
+        return "";
     }
 
     public class Market {
