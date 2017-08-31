@@ -44,15 +44,43 @@ public abstract class MCMarketApi {
 
     public abstract Item getItem(long itemID);
 
-    public abstract List<Transaction> getTransactions(Filter filter);
+    public List<Transaction> getTransactions() {
+        return getTransactions(0);
+    };
+
+    public List<Transaction> getTransactions(int maxPages) {
+        return getTransactions(null, maxPages);
+    }
+
+    public List<Transaction> getTransactions(TransactionStatus transactionStatus) {
+        return getTransactions(transactionStatus, 0);
+    }
+
+    public abstract List<Transaction> getTransactions(TransactionStatus transactionStatus, int maxPages);
 
     public abstract Transaction getTransaction(long transactionID);
 
-    public abstract List<Purchase> getPurchases();
+    public List<Purchase> getPurchases() {
+        return getPurchases(0);
+    }
+
+    public abstract List<Purchase> getPurchases(int maxPages);
 
     public abstract Purchase getPurchase(long purchaseID);
 
-    public abstract List<Command> getCommands(Filter... filters);
+    public List<Command> getCommands() {
+        return getCommands(0);
+    };
+
+    public List<Command> getCommands(int maxPages) {
+        return getCommands(null, maxPages);
+    };
+
+    public List<Command> getCommands(CommandType commandType) {
+        return getCommands(commandType, 0);
+    };
+
+    public abstract List<Command> getCommands(CommandType commandType, int maxPages);
 
     public abstract Command getCommand(long commandID);
 
@@ -64,7 +92,7 @@ public abstract class MCMarketApi {
             conn = (HttpURLConnection) new URL(BASE_URL + API_KEY + url + "/?format=json").openConnection();
             conn.setRequestMethod("PUT");
         } else {
-            conn = (HttpURLConnection) new URL(BASE_URL + API_KEY + url + "/?format=json&" + query).openConnection();
+            conn = (HttpURLConnection) new URL(BASE_URL + API_KEY + url + "/?format=json" + query).openConnection();
             conn.setRequestMethod("GET");
         }
         conn.setRequestProperty("Content-Type", "application/json");
@@ -83,15 +111,8 @@ public abstract class MCMarketApi {
         return new BufferedReader(new InputStreamReader(conn.getInputStream()));
     }
 
-    protected String buildQueryFromFilters(Filter... filters) {
-        StringBuilder builder = new StringBuilder();
-        for (Filter filter : filters) {
-            if (builder.length() != 0) builder.append("&");
-            builder.append(filter.getName())
-                    .append("=")
-                    .append(filter.getValue());
-        }
-        return builder.toString();
+    protected String buildQueryFromFilter(Filter filter) {
+        return "&" + filter.getName() + "=" + filter.getValue();
     }
 
     public class Market {

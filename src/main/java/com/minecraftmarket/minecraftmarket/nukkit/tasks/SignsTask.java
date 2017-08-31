@@ -35,7 +35,7 @@ public class SignsTask implements Runnable {
             @Override
             public void onRun() {
                 if (plugin.isAuthenticated()) {
-                    List<MCMarketApi.Purchase> purchases = plugin.getApi().getPurchases();
+                    List<MCMarketApi.Purchase> purchases = plugin.getApi().getPurchases(2);
                     Map<Integer, Set<SignsConfig.DonorSign>> donorSigns = plugin.getSignsConfig().getDonorSigns();
                     for (Integer key : donorSigns.keySet()) {
                         for (SignsConfig.DonorSign donorSign : donorSigns.get(key)) {

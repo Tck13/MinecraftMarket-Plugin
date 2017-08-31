@@ -55,12 +55,12 @@ public class JSONApi extends MCMarketApi {
     public List<Category> getCategories() {
         List<Category> categories = new ArrayList<>();
         try {
-            JSONObject response = (JSONObject) PARSER.parse(makeRequest("/categories", "GET", "limit=25"));
+            JSONObject response = (JSONObject) PARSER.parse(makeRequest("/categories", "GET", "&limit=25"));
             long count = (Long) response.get("count");
             long pages = (count / 25) + 1;
 
             for (int i = 1; i <= pages; i++) {
-                if (i > 1) response = (JSONObject) PARSER.parse(makeRequest("/categories", "GET", "limit=25&offset=" + (25 * (i - 1))));
+                if (i > 1) response = (JSONObject) PARSER.parse(makeRequest("/categories", "GET", "&limit=25&offset=" + (25 * (i - 1))));
 
                 JSONArray results = (JSONArray) response.get("results");
                 for (Object categoryElement : results) {
@@ -120,12 +120,12 @@ public class JSONApi extends MCMarketApi {
     public List<Item> getItems() {
         List<Item> items = new ArrayList<>();
         try {
-            JSONObject response = (JSONObject) PARSER.parse(makeRequest("/items", "GET", "limit=25"));
+            JSONObject response = (JSONObject) PARSER.parse(makeRequest("/items", "GET", "&limit=25"));
             long count = (Long) response.get("count");
             long pages = (count / 25) + 1;
 
             for (int i = 1; i <= pages; i++) {
-                if (i > 1) response = (JSONObject) PARSER.parse(makeRequest("/items", "GET", "limit=25&offset=" + (25 * (i - 1))));
+                if (i > 1) response = (JSONObject) PARSER.parse(makeRequest("/items", "GET", "&limit=25&offset=" + (25 * (i - 1))));
 
                 JSONArray results = (JSONArray) response.get("results");
                 for (Object itemElement : results) {
@@ -165,16 +165,20 @@ public class JSONApi extends MCMarketApi {
     }
 
     @Override
-    public List<Transaction> getTransactions(Filter filter) {
+    public List<Transaction> getTransactions(TransactionStatus transactionStatus, int maxPages) {
         List<Transaction> transactions = new ArrayList<>();
         try {
-            String query = buildQueryFromFilters(filter);
-            JSONObject response = (JSONObject) PARSER.parse(makeRequest("/transactions", "GET", "limit=25&" + query));
+            String query = buildQueryFromFilter(transactionStatus);
+            JSONObject response = (JSONObject) PARSER.parse(makeRequest("/transactions", "GET", "&limit=25" + query));
             long count = (Long) response.get("count");
             long pages = (count / 25) + 1;
 
+            if (maxPages > 0 && pages > maxPages) {
+                pages = maxPages;
+            }
+
             for (int i = 1; i <= pages; i++) {
-                if (i > 1) response = (JSONObject) PARSER.parse(makeRequest("/transactions", "GET", "limit=25&offset=" + (25 * (i - 1)) + query));
+                if (i > 1) response = (JSONObject) PARSER.parse(makeRequest("/transactions", "GET", "&limit=25&offset=" + (25 * (i - 1)) + query));
 
                 JSONArray results = (JSONArray) response.get("results");
                 for (Object transactionElement : results) {
@@ -240,15 +244,19 @@ public class JSONApi extends MCMarketApi {
     }
 
     @Override
-    public List<Purchase> getPurchases() {
+    public List<Purchase> getPurchases(int maxPages) {
         List<Purchase> purchases = new ArrayList<>();
         try {
-            JSONObject response = (JSONObject) PARSER.parse(makeRequest("/purchases", "GET", "limit=25"));
+            JSONObject response = (JSONObject) PARSER.parse(makeRequest("/purchases", "GET", "&limit=25"));
             long count = (Long) response.get("count");
             long pages = (count / 25) + 1;
 
+            if (maxPages > 0 && pages > maxPages) {
+                pages = maxPages;
+            }
+
             for (int i = 1; i <= pages; i++) {
-                if (i > 1) response = (JSONObject) PARSER.parse(makeRequest("/purchases", "GET", "limit=25&offset=" + (25 * (i - 1))));
+                if (i > 1) response = (JSONObject) PARSER.parse(makeRequest("/purchases", "GET", "&limit=25&offset=" + (25 * (i - 1))));
 
                 JSONArray results = (JSONArray) response.get("results");
                 for (Object purchaseElement : results) {
@@ -302,16 +310,20 @@ public class JSONApi extends MCMarketApi {
     }
 
     @Override
-    public List<Command> getCommands(Filter... filters) {
+    public List<Command> getCommands(CommandType commandType, int maxPages) {
         List<Command> commands = new ArrayList<>();
         try {
-            String query = buildQueryFromFilters(filters);
-            JSONObject response = (JSONObject) PARSER.parse(makeRequest("/commands", "GET", "limit=25&" + query));
+            String query = buildQueryFromFilter(commandType);
+            JSONObject response = (JSONObject) PARSER.parse(makeRequest("/commands", "GET", "&limit=25" + query));
             long count = (Long) response.get("count");
             long pages = (count / 25) + 1;
 
+            if (maxPages > 0 && pages > maxPages) {
+                pages = maxPages;
+            }
+
             for (int i = 1; i <= pages; i++) {
-                if (i > 1) response = (JSONObject) PARSER.parse(makeRequest("/commands", "GET", "limit=25&offset=" + (25 * (i - 1)) + query));
+                if (i > 1) response = (JSONObject) PARSER.parse(makeRequest("/commands", "GET", "&limit=25&offset=" + (25 * (i - 1)) + query));
 
                 JSONArray results = (JSONArray) response.get("results");
                 for (Object commandElement : results) {
