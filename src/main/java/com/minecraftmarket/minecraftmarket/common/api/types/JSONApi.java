@@ -52,12 +52,16 @@ public class JSONApi extends MCMarketApi {
     }
 
     @Override
-    public List<Category> getCategories() {
+    public List<Category> getCategories(int maxPages) {
         List<Category> categories = new ArrayList<>();
         try {
             JSONObject response = (JSONObject) PARSER.parse(makeRequest("/categories", "GET", "&limit=25"));
             long count = (Long) response.get("count");
             long pages = (count / 25) + 1;
+
+            if (maxPages > 0 && pages > maxPages) {
+                pages = maxPages;
+            }
 
             for (int i = 1; i <= pages; i++) {
                 if (i > 1) response = (JSONObject) PARSER.parse(makeRequest("/categories", "GET", "&limit=25&offset=" + (25 * (i - 1))));
@@ -117,12 +121,16 @@ public class JSONApi extends MCMarketApi {
     }
 
     @Override
-    public List<Item> getItems() {
+    public List<Item> getItems(int maxPages) {
         List<Item> items = new ArrayList<>();
         try {
             JSONObject response = (JSONObject) PARSER.parse(makeRequest("/items", "GET", "&limit=25"));
             long count = (Long) response.get("count");
             long pages = (count / 25) + 1;
+
+            if (maxPages > 0 && pages > maxPages) {
+                pages = maxPages;
+            }
 
             for (int i = 1; i <= pages; i++) {
                 if (i > 1) response = (JSONObject) PARSER.parse(makeRequest("/items", "GET", "&limit=25&offset=" + (25 * (i - 1))));

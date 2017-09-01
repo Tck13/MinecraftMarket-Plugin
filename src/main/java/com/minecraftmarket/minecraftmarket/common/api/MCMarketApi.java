@@ -36,11 +36,19 @@ public abstract class MCMarketApi {
 
     public abstract Market getMarket();
 
-    public abstract List<Category> getCategories();
+    public List<Category> getCategories() {
+        return getCategories(0);
+    }
+
+    public abstract List<Category> getCategories(int maxPages);
 
     public abstract Category getCategory(long categoryID);
 
-    public abstract List<Item> getItems();
+    public List<Item> getItems() {
+        return getItems(0);
+    }
+
+    public abstract List<Item> getItems(int maxPages);
 
     public abstract Item getItem(long itemID);
 
