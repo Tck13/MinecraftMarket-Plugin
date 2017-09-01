@@ -145,58 +145,83 @@ public class InventoryManager {
         }
         int invs = Utils.roundUp(totalSlots, size) / size;
 
-        for (int i = 1; i <= invs; i++) {
+        if (invs > 0) {
+            for (int i = 1; i <= invs; i++) {
+                InventoryGUI inventory = new InventoryGUI(replaceVars(guiLayoutConfig.getItemListTile(), category, null), size + 9, true);
+
+                for (int pos = (size * i) - size; pos < totalSlots && pos < size * i; pos++) {
+                    if (category.getSubCategories().size() > 0 && pos < Utils.roundUp(category.getSubCategories().size(), 9)) {
+                        if (pos < category.getSubCategories().size()) {
+                            MCMarketApi.Category subCategory = category.getSubCategories().get(pos);
+                            inventory.addItem(createCategoryInv(subCategory, category.getId() + "|" + i), (player, slot, item) -> {
+                                inventories.get(subCategory.getId() + "|1").open(player);
+                                return true;
+                            });
+                        }
+                        continue;
+                    }
+
+                    int itemPos = pos;
+                    int itemSlot = pos;
+                    if (category.getSubCategories().size() > 0) {
+                        itemPos = pos - Utils.roundUp(category.getSubCategories().size(), 9);
+                        if (i > (Utils.roundUp(Utils.roundUp(category.getSubCategories().size(), 9), size) / size)) {
+                            itemSlot = pos - ((i - 1) * size);
+                        }
+                    }
+
+                    MCMarketApi.Item item = category.getItems().get(itemPos);
+                    ItemStackBuilder itemIcon = getItemFromString(item.getIcon());
+                    if (itemIcon == null) itemIcon = new ItemStackBuilder(Material.CHEST);
+                    itemIcon.withName(replaceVars(guiLayoutConfig.getItemName(), category, item));
+                    for (String lines : guiLayoutConfig.getItemLore()) {
+                        for (String line : replaceVars(lines, category, item).split("\r\n")) {
+                            itemIcon.withLore(line);
+                        }
+                    }
+
+                    inventory.setItem(itemSlot, itemIcon.build(), (player, slot, itemStack) -> {
+                        player.closeInventory();
+                        player.sendMessage(Colors.color(I18n.tl("prefix") + " " + I18n.tl("gui_item_url", item.getUrl())));
+                        return true;
+                    });
+                }
+
+                if (i > 1) {
+                    int invNr = i - 1;
+                    inventory.setItem(size, previousPageItem, (player, slot, item) -> {
+                        inventories.get(category.getId() + "|" + invNr).open(player);
+                        return true;
+                    });
+                }
+
+                if (i != invs) {
+                    int invNr = i + 1;
+                    inventory.setItem(size + 8, nextPageItem, (player, slot, item) -> {
+                        inventories.get(category.getId() + "|" + invNr).open(player);
+                        return true;
+                    });
+                }
+
+                for (int pos = size; pos < size + 9; pos++) {
+                    if (inventory.getItem(pos) == null) {
+                        inventory.setItem(pos, fillItem);
+                    }
+                }
+
+                inventory.setItem(size + 4, backItem, (player, slot, item) -> {
+                    if (parent != null) {
+                        inventories.get(parent).open(player);
+                    } else {
+                        open(player);
+                    }
+                    return true;
+                });
+
+                inventories.put(category.getId() + "|" + i, inventory);
+            }
+        } else {
             InventoryGUI inventory = new InventoryGUI(replaceVars(guiLayoutConfig.getItemListTile(), category, null), size + 9, true);
-
-            for (int pos = (size * i) - size; pos < totalSlots && pos < size * i; pos++) {
-                if (category.getSubCategories().size() > 0 && pos < Utils.roundUp(category.getSubCategories().size(), 9)) {
-                    if (pos < category.getSubCategories().size()) {
-                        MCMarketApi.Category subCategory = category.getSubCategories().get(pos);
-                        inventory.addItem(createCategoryInv(subCategory, category.getId() + "|" + i), (player, slot, item) -> {
-                            inventories.get(subCategory.getId() + "|1").open(player);
-                            return true;
-                        });
-                    }
-                    continue;
-                }
-
-                int itemPos = pos;
-                if (category.getSubCategories().size() > 0) {
-                    itemPos = pos - Utils.roundUp(category.getSubCategories().size(), 9);
-                }
-
-                MCMarketApi.Item item = category.getItems().get(itemPos);
-                ItemStackBuilder itemIcon = getItemFromString(item.getIcon());
-                if (itemIcon == null) itemIcon = new ItemStackBuilder(Material.CHEST);
-                itemIcon.withName(replaceVars(guiLayoutConfig.getItemName(), category, item));
-                for (String lines : guiLayoutConfig.getItemLore()) {
-                    for (String line : replaceVars(lines, category, item).split("\r\n")) {
-                        itemIcon.withLore(line);
-                    }
-                }
-
-                inventory.setItem(itemPos, itemIcon.build(), (player, slot, itemStack) -> {
-                    player.closeInventory();
-                    player.sendMessage(Colors.color(I18n.tl("prefix") + " " + I18n.tl("gui_item_url", item.getUrl())));
-                    return true;
-                });
-            }
-
-            if (i > 1) {
-                int invNr = i - 1;
-                inventory.setItem(size, previousPageItem, (player, slot, item) -> {
-                    inventories.get(category.getId() + "|" + invNr).open(player);
-                    return true;
-                });
-            }
-
-            if (i != invs) {
-                int invNr = i + 1;
-                inventory.setItem(size + 8, nextPageItem, (player, slot, item) -> {
-                    inventories.get(category.getId() + "|" + invNr).open(player);
-                    return true;
-                });
-            }
 
             for (int pos = size; pos < size + 9; pos++) {
                 if (inventory.getItem(pos) == null) {
@@ -213,7 +238,7 @@ public class InventoryManager {
                 return true;
             });
 
-            inventories.put(category.getId() + "|" + i, inventory);
+            inventories.put(category.getId() + "|1", inventory);
         }
 
         ItemStackBuilder catItem = getItemFromString(category.getIcon());

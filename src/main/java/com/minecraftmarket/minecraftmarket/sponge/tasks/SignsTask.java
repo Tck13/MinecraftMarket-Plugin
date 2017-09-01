@@ -38,7 +38,7 @@ public class SignsTask implements Runnable {
     public void updateSigns() {
         Sponge.getScheduler().createTaskBuilder().async().execute(() -> {
             if (plugin.isAuthenticated()) {
-                List<MCMarketApi.Purchase> purchases = plugin.getApi().getPurchases(1);
+                List<MCMarketApi.Purchase> purchases = plugin.getApi().getPurchases(1, 1);
                 Map<Integer, Set<SignsConfig.DonorSign>> donorSigns = plugin.getSignsConfig().getDonorSigns();
                 for (Integer key : donorSigns.keySet()) {
                     for (SignsConfig.DonorSign donorSign : donorSigns.get(key)) {

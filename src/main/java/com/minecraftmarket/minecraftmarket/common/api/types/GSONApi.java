@@ -53,18 +53,35 @@ public class GSONApi extends MCMarketApi {
     }
 
     @Override
-    public List<Category> getCategories(int maxPages) {
+    public long getCategoriesCount() {
+        try {
+            JsonObject response = (JsonObject) PARSER.parse(makeRequest("/categories", "GET", ""));
+            return response.get("count").getAsLong();
+        } catch (Exception e) {
+            if (DEBUG) {
+                e.printStackTrace();
+            }
+        }
+        return 0;
+    }
+
+    @Override
+    public List<Category> getCategories(int startPage, int maxPages) {
         List<Category> categories = new ArrayList<>();
         try {
             JsonObject response = (JsonObject) PARSER.parse(makeRequest("/categories", "GET", "&limit=25"));
             long count = response.get("count").getAsLong();
             long pages = (count / 25) + 1;
 
+            if (startPage <= pages) {
+                pages = pages - (startPage - 1);
+            } else throw new IndexOutOfBoundsException("startPage exceeds the total amount of pages.");
+
             if (maxPages > 0 && pages > maxPages) {
                 pages = maxPages;
             }
 
-            for (int i = 1; i <= pages; i++) {
+            for (int i = startPage; i <= pages; i++) {
                 if (i > 1) response = (JsonObject) PARSER.parse(makeRequest("/categories", "GET", "&limit=25&offset=" + (25 * (i - 1))));
 
                 JsonArray results = response.getAsJsonArray("results");
@@ -122,18 +139,35 @@ public class GSONApi extends MCMarketApi {
     }
 
     @Override
-    public List<Item> getItems(int maxPages) {
+    public long getItemsCount() {
+        try {
+            JsonObject response = (JsonObject) PARSER.parse(makeRequest("/items", "GET", ""));
+            return response.get("count").getAsLong();
+        } catch (Exception e) {
+            if (DEBUG) {
+                e.printStackTrace();
+            }
+        }
+        return 0;
+    }
+
+    @Override
+    public List<Item> getItems(int startPage, int maxPages) {
         List<Item> items = new ArrayList<>();
         try {
             JsonObject response = (JsonObject) PARSER.parse(makeRequest("/items", "GET", "&limit=25"));
             long count = response.get("count").getAsLong();
             long pages = (count / 25) + 1;
 
+            if (startPage <= pages) {
+                pages = pages - (startPage - 1);
+            } else throw new IndexOutOfBoundsException("startPage exceeds the total amount of pages.");
+
             if (maxPages > 0 && pages > maxPages) {
                 pages = maxPages;
             }
 
-            for (int i = 1; i <= pages; i++) {
+            for (int i = startPage; i <= pages; i++) {
                 if (i > 1) response = (JsonObject) PARSER.parse(makeRequest("/items", "GET", "&limit=25&offset=" + (25 * (i - 1))));
 
                 JsonArray results = response.getAsJsonArray("results");
@@ -174,7 +208,21 @@ public class GSONApi extends MCMarketApi {
     }
 
     @Override
-    public List<Transaction> getTransactions(TransactionStatus transactionStatus, int maxPages) {
+    public long getTransactionsCount(TransactionStatus transactionStatus) {
+        try {
+            String query = buildQueryFromFilter(transactionStatus);
+            JsonObject response = (JsonObject) PARSER.parse(makeRequest("/transactions", "GET", query));
+            return response.get("count").getAsLong();
+        } catch (Exception e) {
+            if (DEBUG) {
+                e.printStackTrace();
+            }
+        }
+        return 0;
+    }
+
+    @Override
+    public List<Transaction> getTransactions(TransactionStatus transactionStatus, int startPage, int maxPages) {
         List<Transaction> transactions = new ArrayList<>();
         try {
             String query = buildQueryFromFilter(transactionStatus);
@@ -182,11 +230,15 @@ public class GSONApi extends MCMarketApi {
             long count = response.get("count").getAsLong();
             long pages = (count / 25) + 1;
 
+            if (startPage <= pages) {
+                pages = pages - (startPage - 1);
+            } else throw new IndexOutOfBoundsException("startPage exceeds the total amount of pages.");
+
             if (maxPages > 0 && pages > maxPages) {
                 pages = maxPages;
             }
 
-            for (int i = 1; i <= pages; i++) {
+            for (int i = startPage; i <= pages; i++) {
                 if (i > 1) response = (JsonObject) PARSER.parse(makeRequest("/transactions", "GET", "&limit=25&offset=" + (25 * (i - 1)) + query));
 
                 JsonArray results = response.getAsJsonArray("results");
@@ -253,18 +305,35 @@ public class GSONApi extends MCMarketApi {
     }
 
     @Override
-    public List<Purchase> getPurchases(int maxPages) {
+    public long getPurchasesCount() {
+        try {
+            JsonObject response = (JsonObject) PARSER.parse(makeRequest("/purchases", "GET", ""));
+            return response.get("count").getAsLong();
+        } catch (Exception e) {
+            if (DEBUG) {
+                e.printStackTrace();
+            }
+        }
+        return 0;
+    }
+
+    @Override
+    public List<Purchase> getPurchases(int startPage, int maxPages) {
         List<Purchase> purchases = new ArrayList<>();
         try {
             JsonObject response = (JsonObject) PARSER.parse(makeRequest("/purchases", "GET", "&limit=25"));
             long count = response.get("count").getAsLong();
             long pages = (count / 25) + 1;
 
+            if (startPage <= pages) {
+                pages = pages - (startPage - 1);
+            } else throw new IndexOutOfBoundsException("startPage exceeds the total amount of pages.");
+
             if (maxPages > 0 && pages > maxPages) {
                 pages = maxPages;
             }
 
-            for (int i = 1; i <= pages; i++) {
+            for (int i = startPage; i <= pages; i++) {
                 if (i > 1) response = (JsonObject) PARSER.parse(makeRequest("/purchases", "GET", "&limit=25&offset=" + (25 * (i - 1))));
 
                 JsonArray results = response.getAsJsonArray("results");
@@ -319,7 +388,21 @@ public class GSONApi extends MCMarketApi {
     }
 
     @Override
-    public List<Command> getCommands(CommandType commandType, int maxPages) {
+    public long getCommandsCount(CommandType commandType) {
+        try {
+            String query = buildQueryFromFilter(commandType);
+            JsonObject response = (JsonObject) PARSER.parse(makeRequest("/commands", "GET", query));
+            return response.get("count").getAsLong();
+        } catch (Exception e) {
+            if (DEBUG) {
+                e.printStackTrace();
+            }
+        }
+        return 0;
+    }
+
+    @Override
+    public List<Command> getCommands(CommandType commandType, int startPage, int maxPages) {
         List<Command> commands = new ArrayList<>();
         try {
             String query = buildQueryFromFilter(commandType);
@@ -327,11 +410,15 @@ public class GSONApi extends MCMarketApi {
             long count = response.get("count").getAsLong();
             long pages = (count / 25) + 1;
 
+            if (startPage <= pages) {
+                pages = pages - (startPage - 1);
+            } else throw new IndexOutOfBoundsException("startPage exceeds the total amount of pages.");
+
             if (maxPages > 0 && pages > maxPages) {
                 pages = maxPages;
             }
 
-            for (int i = 1; i <= pages; i++) {
+            for (int i = startPage; i <= pages; i++) {
                 if (i > 1) response = (JsonObject) PARSER.parse(makeRequest("/commands", "GET", "&limit=25&offset=" + (25 * (i - 1)) + query));
 
                 JsonArray results = response.getAsJsonArray("results");

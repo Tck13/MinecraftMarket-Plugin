@@ -36,59 +36,77 @@ public abstract class MCMarketApi {
 
     public abstract Market getMarket();
 
+    public abstract long getCategoriesCount();
+
     public List<Category> getCategories() {
-        return getCategories(0);
+        return getCategories(1, 0);
     }
 
-    public abstract List<Category> getCategories(int maxPages);
+    public abstract List<Category> getCategories(int startPage, int maxPages);
 
     public abstract Category getCategory(long categoryID);
 
+    public abstract long getItemsCount();
+
     public List<Item> getItems() {
-        return getItems(0);
+        return getItems(1, 0);
     }
 
-    public abstract List<Item> getItems(int maxPages);
+    public abstract List<Item> getItems(int startPage, int maxPages);
 
     public abstract Item getItem(long itemID);
 
+    public long getTransactionsCount() {
+        return getTransactionsCount(null);
+    }
+
+    public abstract long getTransactionsCount(TransactionStatus transactionStatus);
+
     public List<Transaction> getTransactions() {
-        return getTransactions(0);
+        return getTransactions(1,0);
     };
 
-    public List<Transaction> getTransactions(int maxPages) {
-        return getTransactions(null, maxPages);
+    public List<Transaction> getTransactions(int startPage, int maxPages) {
+        return getTransactions(null, startPage, maxPages);
     }
 
     public List<Transaction> getTransactions(TransactionStatus transactionStatus) {
-        return getTransactions(transactionStatus, 0);
+        return getTransactions(transactionStatus, 1, 0);
     }
 
-    public abstract List<Transaction> getTransactions(TransactionStatus transactionStatus, int maxPages);
+    public abstract List<Transaction> getTransactions(TransactionStatus transactionStatus, int startPage, int maxPages);
 
     public abstract Transaction getTransaction(long transactionID);
 
+    public abstract long getPurchasesCount();
+
     public List<Purchase> getPurchases() {
-        return getPurchases(0);
+        return getPurchases(1, 0);
     }
 
-    public abstract List<Purchase> getPurchases(int maxPages);
+    public abstract List<Purchase> getPurchases(int startPage, int maxPages);
 
     public abstract Purchase getPurchase(long purchaseID);
 
+    public long getCommandsCount() {
+        return getCommandsCount(null);
+    }
+
+    public abstract long getCommandsCount(CommandType commandType);
+
     public List<Command> getCommands() {
-        return getCommands(0);
+        return getCommands(1, 0);
     };
 
-    public List<Command> getCommands(int maxPages) {
-        return getCommands(null, maxPages);
+    public List<Command> getCommands(int startPage, int maxPages) {
+        return getCommands(null, startPage, maxPages);
     };
 
     public List<Command> getCommands(CommandType commandType) {
-        return getCommands(commandType, 0);
+        return getCommands(commandType, 1, 0);
     };
 
-    public abstract List<Command> getCommands(CommandType commandType, int maxPages);
+    public abstract List<Command> getCommands(CommandType commandType, int startPage, int maxPages);
 
     public abstract Command getCommand(long commandID);
 
