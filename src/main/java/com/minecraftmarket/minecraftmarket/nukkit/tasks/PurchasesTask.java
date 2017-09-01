@@ -34,7 +34,7 @@ public class PurchasesTask extends AsyncTask {
     public void updatePurchases() {
         if (plugin.isAuthenticated()) {
             for (MCMarketApi.CommandType commandType : commandTypes) {
-                for (MCMarketApi.Command command : plugin.getApi().getCommands(commandType)) {
+                for (MCMarketApi.Command command : plugin.getApi().getCommands(commandType, 2)) {
                     runCommand(command);
                 }
             }
