@@ -13,7 +13,6 @@ import com.minecraftmarket.minecraftmarket.bukkit.tasks.PurchasesTask;
 import com.minecraftmarket.minecraftmarket.bukkit.tasks.SignsTask;
 import com.minecraftmarket.minecraftmarket.bukkit.utils.inventories.InventoryGUI;
 import com.minecraftmarket.minecraftmarket.bukkit.utils.updater.Updater;
-import com.minecraftmarket.minecraftmarket.common.api.MCMApi;
 import com.minecraftmarket.minecraftmarket.common.api.MCMarketApi;
 import com.minecraftmarket.minecraftmarket.common.i18n.I18n;
 import com.minecraftmarket.minecraftmarket.common.metrics.BukkitMetrics;
@@ -29,6 +28,7 @@ public final class MCMarket extends JavaPlugin {
     private SignsConfig signsConfig;
     private GUILayoutConfig guiLayoutConfig;
     private SignsLayoutConfig signsLayoutConfig;
+    private MCMarketApi marketApi;
     private boolean authenticated;
     private InventoryManager inventoryManager;
     private SignsTask signsTask;
@@ -102,8 +102,8 @@ public final class MCMarket extends JavaPlugin {
             mainConfig.setApiKey(apiKey);
         }
         getServer().getScheduler().runTaskAsynchronously(this, () -> {
-            new MCMApi(apiKey, mainConfig.isDebug(), MCMApi.ApiType.JSON, getUserAgent());
-            authenticated = getApi().authAPI();
+            marketApi = new MCMarketApi(apiKey, getUserAgent(), mainConfig.isDebug());
+            authenticated = marketApi.authAPI();
             if (!authenticated) {
                 getLogger().warning(I18n.tl("invalid_key", "/MM apiKey <key>"));
             }
@@ -133,7 +133,7 @@ public final class MCMarket extends JavaPlugin {
     }
 
     public MCMarketApi getApi() {
-        return MCMApi.getMarketApi();
+        return marketApi;
     }
 
     public boolean isAuthenticated() {

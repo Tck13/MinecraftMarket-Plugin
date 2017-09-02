@@ -5,7 +5,9 @@ import com.minecraftmarket.minecraftmarket.bukkit.configs.GUILayoutConfig;
 import com.minecraftmarket.minecraftmarket.bukkit.utils.chat.Colors;
 import com.minecraftmarket.minecraftmarket.bukkit.utils.inventories.InventoryGUI;
 import com.minecraftmarket.minecraftmarket.bukkit.utils.items.ItemStackBuilder;
-import com.minecraftmarket.minecraftmarket.common.api.MCMarketApi;
+import com.minecraftmarket.minecraftmarket.common.api.models.Category;
+import com.minecraftmarket.minecraftmarket.common.api.models.Item;
+import com.minecraftmarket.minecraftmarket.common.api.models.Market;
 import com.minecraftmarket.minecraftmarket.common.i18n.I18n;
 import com.minecraftmarket.minecraftmarket.common.utils.Utils;
 import org.bukkit.Material;
@@ -26,7 +28,7 @@ public class InventoryManager {
     private ItemStack backItem;
     private ItemStack previousPageItem;
     private ItemStack nextPageItem;
-    private MCMarketApi.Market market;
+    private Market market;
 
     public InventoryManager(MCMarket plugin) {
         this.plugin = plugin;
@@ -68,14 +70,14 @@ public class InventoryManager {
             if (plugin.isAuthenticated()) {
                 market = plugin.getApi().getMarket();
 
-                List<MCMarketApi.Category> categories = plugin.getApi().getCategories();
+                List<Category> categories = plugin.getApi().getCategories();
                 int invs = Utils.roundUp(categories.size(), size) / size;
 
                 for (int i = 1; i <= invs; i++) {
                     InventoryGUI inventory = new InventoryGUI(guiLayoutConfig.getCategoryListTile(), size + 9, true);
 
                     for (int pos = (size * i) - size; pos < categories.size() && pos < size * i; pos++) {
-                        MCMarketApi.Category category = categories.get(pos);
+                        Category category = categories.get(pos);
                         inventory.addItem(createCategoryInv(category, null), (player, slot, item) -> {
                             inventories.get(category.getId() + "|1").open(player);
                             return true;
@@ -131,7 +133,7 @@ public class InventoryManager {
         }
     }
 
-    private ItemStack createCategoryInv(MCMarketApi.Category category, String parent) {
+    private ItemStack createCategoryInv(Category category, String parent) {
         GUILayoutConfig guiLayoutConfig = plugin.getGUILayoutConfig();
 
         int size = guiLayoutConfig.getGuiRows() * 9;
@@ -152,7 +154,7 @@ public class InventoryManager {
                 for (int pos = (size * i) - size; pos < totalSlots && pos < size * i; pos++) {
                     if (category.getSubCategories().size() > 0 && pos < Utils.roundUp(category.getSubCategories().size(), 9)) {
                         if (pos < category.getSubCategories().size()) {
-                            MCMarketApi.Category subCategory = category.getSubCategories().get(pos);
+                            Category subCategory = category.getSubCategories().get(pos);
                             inventory.addItem(createCategoryInv(subCategory, category.getId() + "|" + i), (player, slot, item) -> {
                                 inventories.get(subCategory.getId() + "|1").open(player);
                                 return true;
@@ -170,7 +172,7 @@ public class InventoryManager {
                         }
                     }
 
-                    MCMarketApi.Item item = category.getItems().get(itemPos);
+                    Item item = category.getItems().get(itemPos);
                     ItemStackBuilder itemIcon = getItemFromString(item.getIcon());
                     if (itemIcon == null) itemIcon = new ItemStackBuilder(Material.CHEST);
                     itemIcon.withName(replaceVars(guiLayoutConfig.getItemName(), category, item));
@@ -270,7 +272,7 @@ public class InventoryManager {
         return itemBuilder;
     }
 
-    private String replaceVars(String msg, MCMarketApi.Category category, MCMarketApi.Item item) {
+    private String replaceVars(String msg, Category category, Item item) {
         if (market != null) {
             msg = msg.replace("{market_id}", "" + market.getId())
                     .replace("{market_name}", market.getName())

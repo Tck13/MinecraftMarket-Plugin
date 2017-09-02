@@ -6,7 +6,6 @@ import cn.nukkit.event.HandlerList;
 import cn.nukkit.plugin.PluginBase;
 import cn.nukkit.scheduler.AsyncTask;
 import cn.nukkit.utils.TextFormat;
-import com.minecraftmarket.minecraftmarket.common.api.MCMApi;
 import com.minecraftmarket.minecraftmarket.common.api.MCMarketApi;
 import com.minecraftmarket.minecraftmarket.common.i18n.I18n;
 import com.minecraftmarket.minecraftmarket.common.metrics.NukkitMetrics;
@@ -31,6 +30,7 @@ public final class MCMarket extends PluginBase {
     private MainConfig mainConfig;
     private SignsConfig signsConfig;
     private SignsLayoutConfig signsLayoutConfig;
+    private MCMarketApi marketApi;
     private boolean authenticated;
     private SignsTask signsTask;
     private PurchasesTask purchasesTask;
@@ -122,8 +122,8 @@ public final class MCMarket extends PluginBase {
         getServer().getScheduler().scheduleAsyncTask(this, new AsyncTask() {
             @Override
             public void onRun() {
-                new MCMApi(apiKey, mainConfig.isDebug(), MCMApi.ApiType.GSON, getUserAgent());
-                authenticated = getApi().authAPI();
+                marketApi = new MCMarketApi(apiKey, getUserAgent(), mainConfig.isDebug());
+                authenticated = marketApi.authAPI();
                 if (!authenticated) {
                     getLogger().warning(I18n.tl("invalid_key", "/MM apiKey <key>"));
                 }
@@ -147,7 +147,7 @@ public final class MCMarket extends PluginBase {
     }
 
     public MCMarketApi getApi() {
-        return MCMApi.getMarketApi();
+        return marketApi;
     }
 
     public boolean isAuthenticated() {

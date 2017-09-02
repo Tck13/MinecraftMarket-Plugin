@@ -1,6 +1,7 @@
 package com.minecraftmarket.minecraftmarket.sponge.tasks;
 
 import com.minecraftmarket.minecraftmarket.common.api.MCMarketApi;
+import com.minecraftmarket.minecraftmarket.common.api.models.Command;
 import com.minecraftmarket.minecraftmarket.sponge.MCMarket;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
@@ -35,14 +36,14 @@ public class PurchasesTask implements Runnable {
     public void updatePurchases() {
         if (plugin.isAuthenticated()) {
             for (MCMarketApi.CommandType commandType : commandTypes) {
-                for (MCMarketApi.Command command : plugin.getApi().getCommands(commandType, 1, 2)) {
+                for (Command command : plugin.getApi().getCommands(commandType, 1, 2)) {
                     runCommand(command);
                 }
             }
         }
     }
 
-    private void runCommand(MCMarketApi.Command command) {
+    private void runCommand(Command command) {
         if (Sponge.isServerAvailable()) {
             Optional<Player> player = Sponge.getServer().getPlayer(command.getPlayer().getName());
             boolean shouldExecute = true;

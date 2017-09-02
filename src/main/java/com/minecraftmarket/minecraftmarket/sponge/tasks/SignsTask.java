@@ -1,7 +1,7 @@
 package com.minecraftmarket.minecraftmarket.sponge.tasks;
 
 
-import com.minecraftmarket.minecraftmarket.common.api.MCMarketApi;
+import com.minecraftmarket.minecraftmarket.common.api.models.Purchase;
 import com.minecraftmarket.minecraftmarket.sponge.MCMarket;
 import com.minecraftmarket.minecraftmarket.sponge.config.SignsConfig;
 import com.minecraftmarket.minecraftmarket.sponge.utils.chat.Colors;
@@ -38,14 +38,14 @@ public class SignsTask implements Runnable {
     public void updateSigns() {
         Sponge.getScheduler().createTaskBuilder().async().execute(() -> {
             if (plugin.isAuthenticated()) {
-                List<MCMarketApi.Purchase> purchases = plugin.getApi().getPurchases(1, 1);
+                List<Purchase> purchases = plugin.getApi().getPurchases(1, 1);
                 Map<Integer, Set<SignsConfig.DonorSign>> donorSigns = plugin.getSignsConfig().getDonorSigns();
                 for (Integer key : donorSigns.keySet()) {
                     for (SignsConfig.DonorSign donorSign : donorSigns.get(key)) {
                         if (donorSign.getLocation().getTileEntity().isPresent() && donorSign.getLocation().getTileEntity().get() instanceof Sign) {
                             Sign sign = (Sign) donorSign.getLocation().getTileEntity().get();
                             if (key <= purchases.size()) {
-                                MCMarketApi.Purchase purchase = purchases.get(key - 1);
+                                Purchase purchase = purchases.get(key - 1);
                                 List<String> lines = plugin.getSignsLayoutConfig().getActiveLayout();
                                 Optional<SignData> optionalSignData = sign.get(SignData.class);
                                 if (optionalSignData.isPresent()) {
@@ -114,7 +114,7 @@ public class SignsTask implements Runnable {
         }).submit(plugin);
     }
 
-    private Text replaceVars(String msg, MCMarketApi.Purchase purchase) {
+    private Text replaceVars(String msg, Purchase purchase) {
         msg = msg.replace("{purchase_id}", "" + purchase.getId())
                 .replace("{purchase_name}", purchase.getName())
                 .replace("{purchase_price}", purchase.getPrice())

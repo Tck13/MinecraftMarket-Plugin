@@ -4,7 +4,6 @@ import com.minecraftmarket.minecraftmarket.bungee.commands.MMCmd;
 import com.minecraftmarket.minecraftmarket.bungee.configs.MainConfig;
 import com.minecraftmarket.minecraftmarket.bungee.tasks.PurchasesTask;
 import com.minecraftmarket.minecraftmarket.bungee.utils.updater.Updater;
-import com.minecraftmarket.minecraftmarket.common.api.MCMApi;
 import com.minecraftmarket.minecraftmarket.common.api.MCMarketApi;
 import com.minecraftmarket.minecraftmarket.common.i18n.I18n;
 import com.minecraftmarket.minecraftmarket.common.metrics.BungeeMetrics;
@@ -19,6 +18,7 @@ import java.util.concurrent.TimeUnit;
 public final class MCMarket extends Plugin {
     private I18n i18n;
     private MainConfig mainConfig;
+    private MCMarketApi marketApi;
     private boolean authenticated;
     private PurchasesTask purchasesTask;
 
@@ -68,8 +68,8 @@ public final class MCMarket extends Plugin {
             mainConfig.setApiKey(apiKey);
         }
         getProxy().getScheduler().runAsync(this, () -> {
-            new MCMApi(apiKey, mainConfig.isDebug(), MCMApi.ApiType.GSON, getUserAgent());
-            authenticated = getApi().authAPI();
+            marketApi = new MCMarketApi(apiKey, getUserAgent(), mainConfig.isDebug());
+            authenticated = marketApi.authAPI();
             if (!authenticated) {
                 getLogger().warning(I18n.tl("invalid_key", "/MM apiKey <key>"));
             }
@@ -80,7 +80,7 @@ public final class MCMarket extends Plugin {
     }
 
     public MCMarketApi getApi() {
-        return MCMApi.getMarketApi();
+        return marketApi;
     }
 
     public boolean isAuthenticated() {

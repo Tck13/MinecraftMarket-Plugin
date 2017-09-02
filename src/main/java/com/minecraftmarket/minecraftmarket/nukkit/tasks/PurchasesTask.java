@@ -7,6 +7,7 @@ import cn.nukkit.item.Item;
 import cn.nukkit.scheduler.AsyncTask;
 import cn.nukkit.scheduler.NukkitRunnable;
 import com.minecraftmarket.minecraftmarket.common.api.MCMarketApi;
+import com.minecraftmarket.minecraftmarket.common.api.models.Command;
 import com.minecraftmarket.minecraftmarket.nukkit.MCMarket;
 
 import java.util.Arrays;
@@ -34,14 +35,14 @@ public class PurchasesTask extends AsyncTask {
     public void updatePurchases() {
         if (plugin.isAuthenticated()) {
             for (MCMarketApi.CommandType commandType : commandTypes) {
-                for (MCMarketApi.Command command : plugin.getApi().getCommands(commandType, 1, 2)) {
+                for (Command command : plugin.getApi().getCommands(commandType, 1, 2)) {
                     runCommand(command);
                 }
             }
         }
     }
 
-    private void runCommand(MCMarketApi.Command command) {
+    private void runCommand(Command command) {
         Player player = Server.getInstance().getPlayerExact(command.getPlayer().getName());
         boolean shouldExecute = true;
         if (command.isRequiredOnline() && (player == null || !player.isOnline())) {

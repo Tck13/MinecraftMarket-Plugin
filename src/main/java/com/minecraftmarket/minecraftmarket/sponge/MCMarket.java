@@ -1,7 +1,6 @@
 package com.minecraftmarket.minecraftmarket.sponge;
 
 import com.google.inject.Inject;
-import com.minecraftmarket.minecraftmarket.common.api.MCMApi;
 import com.minecraftmarket.minecraftmarket.common.api.MCMarketApi;
 import com.minecraftmarket.minecraftmarket.common.i18n.I18n;
 import com.minecraftmarket.minecraftmarket.common.metrics.SpongeMetrics;
@@ -57,6 +56,7 @@ public final class MCMarket {
     private MainConfig mainConfig;
     private SignsConfig signsConfig;
     private SignsLayoutConfig signsLayoutConfig;
+    private MCMarketApi marketApi;
     private boolean authenticated;
     private SignsTask signsTask;
     private PurchasesTask purchasesTask;
@@ -135,8 +135,8 @@ public final class MCMarket {
         }
         if (Sponge.isServerAvailable()) {
             Sponge.getScheduler().createTaskBuilder().async().execute(() -> {
-                new MCMApi(apiKey, mainConfig.isDebug(), MCMApi.ApiType.GSON, getUserAgent());
-                authenticated = getApi().authAPI();
+                marketApi = new MCMarketApi(apiKey, getUserAgent(), mainConfig.isDebug());
+                authenticated = marketApi.authAPI();
                 if (!authenticated) {
                     logger.warn(I18n.tl("invalid_key", "/MM apiKey <key>"));
                 }
@@ -164,7 +164,7 @@ public final class MCMarket {
     }
 
     public MCMarketApi getApi() {
-        return MCMApi.getMarketApi();
+        return marketApi;
     }
 
     public boolean isAuthenticated() {

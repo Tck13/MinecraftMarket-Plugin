@@ -2,6 +2,7 @@ package com.minecraftmarket.minecraftmarket.bukkit.tasks;
 
 import com.minecraftmarket.minecraftmarket.bukkit.MCMarket;
 import com.minecraftmarket.minecraftmarket.common.api.MCMarketApi;
+import com.minecraftmarket.minecraftmarket.common.api.models.Command;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -34,14 +35,14 @@ public class PurchasesTask implements Runnable {
     public void updatePurchases() {
         if (plugin.isAuthenticated()) {
             for (MCMarketApi.CommandType commandType : commandTypes) {
-                for (MCMarketApi.Command command : plugin.getApi().getCommands(commandType, 1, 2)) {
+                for (Command command : plugin.getApi().getCommands(commandType, 1, 2)) {
                     runCommand(command);
                 }
             }
         }
     }
 
-    private void runCommand(MCMarketApi.Command command) {
+    private void runCommand(Command command) {
         Player player = Bukkit.getPlayerExact(command.getPlayer().getName());
         boolean shouldExecute = true;
         if (command.isRequiredOnline() && (player == null || !player.isOnline())) {
