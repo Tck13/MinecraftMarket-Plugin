@@ -1,6 +1,7 @@
 package com.minecraftmarket.minecraftmarket.bukkit;
 
 import com.minecraftmarket.minecraftmarket.bukkit.commands.MMCmd;
+import com.minecraftmarket.minecraftmarket.bukkit.commands.MMGui;
 import com.minecraftmarket.minecraftmarket.bukkit.configs.GUILayoutConfig;
 import com.minecraftmarket.minecraftmarket.bukkit.configs.MainConfig;
 import com.minecraftmarket.minecraftmarket.bukkit.configs.SignsConfig;
@@ -41,6 +42,7 @@ public final class MCMarket extends JavaPlugin {
         reloadConfigs(null);
 
         getCommand("MinecraftMarket").setExecutor(new MMCmd(this));
+        getCommand("MMGui").setExecutor(new MMGui(this));
 
         new BukkitMetrics(this);
         new Updater(this, 44031, pluginURL -> {
