@@ -114,14 +114,14 @@ public final class MCMarket {
                 if (signsTask == null) {
                     signsTask = new SignsTask(MCMarket.this);
                 }
-                Sponge.getScheduler().createTaskBuilder().delayTicks(20 * 10).intervalTicks(20 * 60 * mainConfig.getCheckInterval()).execute(signsTask).submit(MCMarket.this);
+                Sponge.getScheduler().createTaskBuilder().delayTicks(20 * 10).intervalTicks(mainConfig.getCheckInterval() > 0 ? 20 * 60 * mainConfig.getCheckInterval() : 20 * 60).execute(signsTask).submit(MCMarket.this);
                 Sponge.getEventManager().registerListeners(MCMarket.this, new SignsListener(MCMarket.this));
             }
 
             if (purchasesTask == null) {
                 purchasesTask = new PurchasesTask(MCMarket.this);
             }
-            Sponge.getScheduler().createTaskBuilder().async().delayTicks(20 * 10).intervalTicks(20 * 60 * mainConfig.getCheckInterval()).execute(purchasesTask).submit(MCMarket.this);
+            Sponge.getScheduler().createTaskBuilder().async().delayTicks(20 * 10).intervalTicks(mainConfig.getCheckInterval() > 0 ? 20 * 60 * mainConfig.getCheckInterval() : 20 * 60).execute(purchasesTask).submit(MCMarket.this);
 
             if (response != null) {
                 response.done(result);

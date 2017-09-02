@@ -55,7 +55,7 @@ public final class MCMarket extends Plugin {
             if (purchasesTask == null) {
                 purchasesTask = new PurchasesTask(MCMarket.this);
             }
-            getProxy().getScheduler().schedule(MCMarket.this, purchasesTask, 10, 60 * mainConfig.getCheckInterval(), TimeUnit.SECONDS);
+            getProxy().getScheduler().schedule(MCMarket.this, purchasesTask, 10, mainConfig.getCheckInterval() > 0 ? 60 * mainConfig.getCheckInterval() : 60, TimeUnit.SECONDS);
 
             if (response != null) {
                 response.done(result);

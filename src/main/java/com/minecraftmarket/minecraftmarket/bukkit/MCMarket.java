@@ -82,14 +82,14 @@ public final class MCMarket extends JavaPlugin {
                 if (signsTask == null) {
                     signsTask = new SignsTask(MCMarket.this);
                 }
-                getServer().getScheduler().runTaskTimer(MCMarket.this, signsTask, 20 * 10, 20 * 60 * mainConfig.getCheckInterval());
+                getServer().getScheduler().runTaskTimer(MCMarket.this, signsTask, 20 * 10, mainConfig.getCheckInterval() > 0 ? 20 * 60 * mainConfig.getCheckInterval() : 20 * 60);
                 getServer().getPluginManager().registerEvents(new SignsListener(MCMarket.this), MCMarket.this);
             }
 
             if (purchasesTask == null) {
                 purchasesTask = new PurchasesTask(MCMarket.this);
             }
-            getServer().getScheduler().runTaskTimerAsynchronously(MCMarket.this, purchasesTask, 20 * 10, 20 * 60 * mainConfig.getCheckInterval());
+            getServer().getScheduler().runTaskTimerAsynchronously(MCMarket.this, purchasesTask, 20 * 10, mainConfig.getCheckInterval() > 0 ? 20 * 60 * mainConfig.getCheckInterval() : 20 * 60);
 
             if (response != null) {
                 response.done(result);
