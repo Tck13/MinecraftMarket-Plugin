@@ -18,7 +18,11 @@ public class MMGui implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if (sender instanceof Player) {
-            plugin.getInventoryManager().open((Player) sender);
+            if (plugin.getMainConfig().isUseGUI()) {
+                plugin.getInventoryManager().open((Player) sender);
+            } else {
+                sender.sendMessage(Colors.color(I18n.tl("prefix") + " " + I18n.tl("cmd_gui_disabled")));
+            }
         } else {
             sender.sendMessage(Colors.color(I18n.tl("prefix") + " " + I18n.tl("cmd_invalid_sender")));
         }
