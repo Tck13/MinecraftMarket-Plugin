@@ -17,7 +17,7 @@ public class Check extends Cmd {
 
     @Override
     public void run(CommandSource sender, String[] args) {
-        if (plugin.isAuthenticated()) {
+        if (MCMarket.isAuthenticated()) {
             sender.sendMessage(Colors.color(I18n.tl("prefix") + " " + I18n.tl("cmd_check_purchases")));
             Sponge.getScheduler().createTaskBuilder().async().execute(() -> plugin.getPurchasesTask().updatePurchases()).submit(plugin);
         } else {

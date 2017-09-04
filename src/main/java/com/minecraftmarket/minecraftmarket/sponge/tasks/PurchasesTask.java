@@ -34,9 +34,9 @@ public class PurchasesTask implements Runnable {
     }
 
     public void updatePurchases() {
-        if (plugin.isAuthenticated()) {
+        if (MCMarket.isAuthenticated()) {
             for (MCMarketApi.CommandType commandType : commandTypes) {
-                for (Command command : plugin.getApi().getCommands(commandType, 1, 2)) {
+                for (Command command : MCMarket.getApi().getCommands(commandType, 1, 2)) {
                     runCommand(command);
                 }
             }
@@ -80,7 +80,7 @@ public class PurchasesTask implements Runnable {
                             }).submit(plugin);
                         }
                     }).submit(plugin);
-                    plugin.getApi().setExecuted(command.getId());
+                    MCMarket.getApi().setExecuted(command.getId());
                 }
             }
         }

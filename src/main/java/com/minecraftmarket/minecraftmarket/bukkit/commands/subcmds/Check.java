@@ -15,7 +15,7 @@ public class Check extends Cmd {
 
     @Override
     public void run(CommandSender sender, String[] args) {
-        if (plugin.isAuthenticated()) {
+        if (MCMarket.isAuthenticated()) {
             sender.sendMessage(Colors.color(I18n.tl("prefix") + " " + I18n.tl("cmd_check_purchases")));
             plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> plugin.getPurchasesTask().updatePurchases());
         } else {

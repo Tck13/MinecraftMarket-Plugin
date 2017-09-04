@@ -56,8 +56,8 @@ public final class MCMarket {
     private MainConfig mainConfig;
     private SignsConfig signsConfig;
     private SignsLayoutConfig signsLayoutConfig;
-    private MCMarketApi marketApi;
-    private boolean authenticated;
+    private static MCMarketApi marketApi;
+    private static boolean authenticated;
     private SignsTask signsTask;
     private PurchasesTask purchasesTask;
 
@@ -163,11 +163,11 @@ public final class MCMarket {
         return signsLayoutConfig;
     }
 
-    public MCMarketApi getApi() {
+    public static MCMarketApi getApi() {
         return marketApi;
     }
 
-    public boolean isAuthenticated() {
+    public static boolean isAuthenticated() {
         return authenticated;
     }
 

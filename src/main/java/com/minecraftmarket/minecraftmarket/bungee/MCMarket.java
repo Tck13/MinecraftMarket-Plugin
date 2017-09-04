@@ -18,8 +18,8 @@ import java.util.concurrent.TimeUnit;
 public final class MCMarket extends Plugin {
     private I18n i18n;
     private MainConfig mainConfig;
-    private MCMarketApi marketApi;
-    private boolean authenticated;
+    private static MCMarketApi marketApi;
+    private static boolean authenticated;
     private PurchasesTask purchasesTask;
 
     @Override
@@ -79,11 +79,11 @@ public final class MCMarket extends Plugin {
         });
     }
 
-    public MCMarketApi getApi() {
+    public static MCMarketApi getApi() {
         return marketApi;
     }
 
-    public boolean isAuthenticated() {
+    public static boolean isAuthenticated() {
         return authenticated;
     }
 

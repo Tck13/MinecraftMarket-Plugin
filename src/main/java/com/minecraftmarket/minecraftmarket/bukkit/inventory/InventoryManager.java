@@ -5,6 +5,7 @@ import com.minecraftmarket.minecraftmarket.bukkit.configs.GUILayoutConfig;
 import com.minecraftmarket.minecraftmarket.bukkit.utils.chat.Colors;
 import com.minecraftmarket.minecraftmarket.bukkit.utils.inventories.InventoryGUI;
 import com.minecraftmarket.minecraftmarket.bukkit.utils.items.ItemStackBuilder;
+import com.minecraftmarket.minecraftmarket.common.api.MCMarketApi;
 import com.minecraftmarket.minecraftmarket.common.api.models.Category;
 import com.minecraftmarket.minecraftmarket.common.api.models.Item;
 import com.minecraftmarket.minecraftmarket.common.api.models.Market;
@@ -67,10 +68,11 @@ public class InventoryManager {
             if (nextPageItemBuilder == null) nextPageItemBuilder = new ItemStackBuilder(Material.PAPER);
             nextPageItem = nextPageItemBuilder.withName(Colors.color(I18n.tl("gui_next_page"))).build();
 
-            if (plugin.isAuthenticated()) {
-                market = plugin.getApi().getMarket();
+            if (MCMarket.isAuthenticated()) {
+                MCMarketApi marketApi = MCMarket.getApi();
+                market = marketApi.getMarket();
 
-                List<Category> categories = plugin.getApi().getCategories();
+                List<Category> categories = marketApi.getCategories();
                 int invs = Utils.roundUp(categories.size(), size) / size;
 
                 for (int i = 1; i <= invs; i++) {
@@ -122,7 +124,7 @@ public class InventoryManager {
     }
 
     public void open(Player player) {
-        if (plugin.isAuthenticated()) {
+        if (MCMarket.isAuthenticated()) {
             if (mainInventories.size() > 0) {
                 mainInventories.get(0).open(player);
             } else {

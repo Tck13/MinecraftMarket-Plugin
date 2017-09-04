@@ -16,7 +16,7 @@ public class UpdateSigns extends Cmd {
     @Override
     public void run(CommandSource sender, String[] args) {
         if (plugin.getMainConfig().isUseSigns()) {
-            if (plugin.isAuthenticated()) {
+            if (MCMarket.isAuthenticated()) {
                 sender.sendMessage(Colors.color(I18n.tl("prefix") + " " + I18n.tl("cmd_sign_update")));
                 plugin.getSignsTask().updateSigns();
             } else {

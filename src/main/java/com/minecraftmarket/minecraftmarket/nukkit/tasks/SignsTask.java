@@ -34,8 +34,8 @@ public class SignsTask implements Runnable {
         plugin.getServer().getScheduler().scheduleAsyncTask(plugin, new AsyncTask() {
             @Override
             public void onRun() {
-                if (plugin.isAuthenticated()) {
-                    List<Purchase> purchases = plugin.getApi().getPurchases(1, 1);
+                if (MCMarket.isAuthenticated()) {
+                    List<Purchase> purchases = MCMarket.getApi().getPurchases(1, 1);
                     Map<Integer, Set<SignsConfig.DonorSign>> donorSigns = plugin.getSignsConfig().getDonorSigns();
                     for (Integer key : donorSigns.keySet()) {
                         for (SignsConfig.DonorSign donorSign : donorSigns.get(key)) {

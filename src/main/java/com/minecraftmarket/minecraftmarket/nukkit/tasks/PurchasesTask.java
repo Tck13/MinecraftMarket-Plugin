@@ -33,9 +33,9 @@ public class PurchasesTask extends AsyncTask {
     }
 
     public void updatePurchases() {
-        if (plugin.isAuthenticated()) {
+        if (MCMarket.isAuthenticated()) {
             for (MCMarketApi.CommandType commandType : commandTypes) {
-                for (Command command : plugin.getApi().getCommands(commandType, 1, 2)) {
+                for (Command command : MCMarket.getApi().getCommands(commandType, 1, 2)) {
                     runCommand(command);
                 }
             }
@@ -77,7 +77,7 @@ public class PurchasesTask extends AsyncTask {
                         }
                     }
                 }, command.getDelay() > 0 ? (int) (20 * command.getDelay()) : 1, true);
-                plugin.getApi().setExecuted(command.getId());
+                MCMarket.getApi().setExecuted(command.getId());
             }
         }
     }
