@@ -132,22 +132,14 @@ public class MCMarketApi {
             List<Category> subCategories = new ArrayList<>();
             Iterator<JsonNode> subCategoriesResult = response.get("subcategories").elements();
             while (subCategoriesResult.hasNext()) {
-                Category category = getCategory(subCategoriesResult.next().get("id").asLong());
+                JsonNode subCategory = subCategoriesResult.next();
+                Category category = getCategory(subCategory.get("id").asLong());
                 if (category != null) {
                     subCategories.add(category);
                 }
             }
 
-            List<Item> items = new ArrayList<>();
-            Iterator<JsonNode> itemsResult = response.get("items").elements();
-            while (itemsResult.hasNext()) {
-                Item item = getItem(itemsResult.next().get("id").asLong());
-                if (item != null) {
-                    items.add(item);
-                }
-            }
-
-            return new Category(id, name, description, icon, subCategories, items, order);
+            return new Category(id, name, description, icon, subCategories, getItems(id), order);
         } catch (Exception e) {
             if (DEBUG) {
                 e.printStackTrace();
@@ -157,8 +149,12 @@ public class MCMarketApi {
     }
 
     public long getItemsCount() {
+        return getItemsCount(0);
+    }
+
+    public long getItemsCount(long categoryID) {
         try {
-            BufferedReader reader = makeRequest("/items", "GET", "");
+            BufferedReader reader = makeRequest("/items", "GET", categoryID > 0 ? "&category=" + categoryID : "");
             JsonNode response = MAPPER.readTree(reader);
             return response.get("count").asLong();
         } catch (Exception e) {
@@ -170,13 +166,17 @@ public class MCMarketApi {
     }
 
     public List<Item> getItems() {
-        return getItems(1, 0);
+        return getItems(0);
     }
 
-    public List<Item> getItems(int startPage, int maxPages) {
+    public List<Item> getItems(long categoryID) {
+        return getItems(categoryID, 1, 0);
+    }
+
+    public List<Item> getItems(long categoryID, int startPage, int maxPages) {
         List<Item> items = new ArrayList<>();
         try {
-            BufferedReader reader = makeRequest("/items", "GET", "&limit=25");
+            BufferedReader reader = makeRequest("/items", "GET", "&limit=25" + (categoryID > 0 ? "&category=" + categoryID : ""));
             JsonNode response = MAPPER.readTree(reader);
             long count = response.get("count").asLong();
             long pages = (count / 25) + 1;
@@ -191,7 +191,7 @@ public class MCMarketApi {
 
             for (int i = startPage; i <= pages; i++) {
                 if (i > 1) {
-                    reader = makeRequest("/items", "GET", "&limit=25&offset=" + (25 * (i - 1)));
+                    reader = makeRequest("/items", "GET", "&limit=25&offset=" + (25 * (i - 1)) + (categoryID > 0 ? "&category=" + categoryID : ""));
                     response = MAPPER.readTree(reader);
                 }
 
@@ -313,6 +313,7 @@ public class MCMarketApi {
                     purchases.add(purchase);
                 }
             }
+
             return new Transaction(id, status, gateway, transaction_id, price, currency, date, player, purchases);
         } catch (Exception e) {
             if (DEBUG) {
