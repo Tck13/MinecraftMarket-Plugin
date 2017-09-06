@@ -27,7 +27,7 @@
         </repository>
         <repository>
             <id>nukkit-repo</id>
-            <url>http://ci.mengcraft.com:8080/plugin/repository/everything/</url>
+            <url>http://ci.regularbox.com/plugin/repository/everything/</url>
         </repository>
         <repository>
             <id>sponge-repo</id>
