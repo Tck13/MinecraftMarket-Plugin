@@ -3,6 +3,7 @@ package com.minecraftmarket.minecraftmarket.bungee.tasks;
 import com.minecraftmarket.minecraftmarket.bungee.MCMarket;
 import com.minecraftmarket.minecraftmarket.bungee.utils.BungeeRunnable;
 import com.minecraftmarket.minecraftmarket.common.api.MCMarketApi;
+import com.minecraftmarket.minecraftmarket.common.api.models.Command;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.util.Arrays;
@@ -29,16 +30,16 @@ public class PurchasesTask implements Runnable {
     }
 
     public void updatePurchases() {
-        if (plugin.isAuthenticated()) {
+        if (MCMarket.isAuthenticated()) {
             for (MCMarketApi.CommandType commandType : commandTypes) {
-                for (MCMarketApi.Command command : plugin.getApi().getCommands(MCMarketApi.CommandStatus.NOT_EXECUTED, commandType)) {
+                for (Command command : MCMarket.getApi().getCommands(commandType, 1, 2)) {
                     runCommand(command);
                 }
             }
         }
     }
 
-    private void runCommand(MCMarketApi.Command command) {
+    private void runCommand(Command command) {
         ProxiedPlayer player = plugin.getProxy().getPlayer(command.getPlayer().getName());
         boolean shouldExecute = true;
         if (command.isRequiredOnline() && (player == null || !player.isConnected())) {
@@ -64,7 +65,7 @@ public class PurchasesTask implements Runnable {
                     }.schedule(plugin, period, period, TimeUnit.SECONDS);
                 }
             }, command.getDelay() > 0 ? command.getDelay() : 1, TimeUnit.SECONDS);
-            plugin.getApi().setExecuted(command.getId());
+            MCMarket.getApi().setExecuted(command.getId());
         }
     }
 }

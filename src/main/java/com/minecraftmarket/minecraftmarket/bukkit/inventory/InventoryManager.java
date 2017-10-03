@@ -6,6 +6,9 @@ import com.minecraftmarket.minecraftmarket.bukkit.utils.chat.Colors;
 import com.minecraftmarket.minecraftmarket.bukkit.utils.inventories.InventoryGUI;
 import com.minecraftmarket.minecraftmarket.bukkit.utils.items.ItemStackBuilder;
 import com.minecraftmarket.minecraftmarket.common.api.MCMarketApi;
+import com.minecraftmarket.minecraftmarket.common.api.models.Category;
+import com.minecraftmarket.minecraftmarket.common.api.models.Item;
+import com.minecraftmarket.minecraftmarket.common.api.models.Market;
 import com.minecraftmarket.minecraftmarket.common.i18n.I18n;
 import com.minecraftmarket.minecraftmarket.common.utils.Utils;
 import org.bukkit.Material;
@@ -26,7 +29,7 @@ public class InventoryManager {
     private ItemStack backItem;
     private ItemStack previousPageItem;
     private ItemStack nextPageItem;
-    private MCMarketApi.Market market;
+    private Market market;
 
     public InventoryManager(MCMarket plugin) {
         this.plugin = plugin;
@@ -39,6 +42,11 @@ public class InventoryManager {
 
         plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
             GUILayoutConfig guiLayoutConfig = plugin.getGUILayoutConfig();
+
+            int size = guiLayoutConfig.getGuiRows() * 9;
+            if (size < 9) {
+                size = 9;
+            }
 
             ItemStackBuilder fillItemBuilder = getItemFromString(guiLayoutConfig.getBottomFillItem());
             if (fillItemBuilder == null) fillItemBuilder = new ItemStackBuilder(Material.IRON_FENCE);
@@ -60,45 +68,54 @@ public class InventoryManager {
             if (nextPageItemBuilder == null) nextPageItemBuilder = new ItemStackBuilder(Material.PAPER);
             nextPageItem = nextPageItemBuilder.withName(Colors.color(I18n.tl("gui_next_page"))).build();
 
-            if (plugin.isAuthenticated()) {
-                market = plugin.getApi().getMarket();
+            if (MCMarket.isAuthenticated()) {
+                MCMarketApi marketApi = MCMarket.getApi();
+                market = marketApi.getMarket();
 
-                List<MCMarketApi.Category> categories = plugin.getApi().getCategories();
-                int invs = Utils.roundUp(categories.size(), 45) / 45;
+                List<Category> categories = marketApi.getCategories();
+                int invs = Utils.roundUp(categories.size(), size) / size;
 
                 for (int i = 1; i <= invs; i++) {
-                    InventoryGUI inventory = new InventoryGUI(guiLayoutConfig.getCategoryListTile(), 54, true);
+                    InventoryGUI inventory = new InventoryGUI(guiLayoutConfig.getCategoryListTile(), size + 9, true);
 
-                    for (int pos = (45 * i) - 45; pos < categories.size() && pos < 45 * i; pos++) {
-                        MCMarketApi.Category category = categories.get(pos);
+                    for (int pos = (size * i) - size; pos < categories.size() && pos < size * i; pos++) {
+                        Category category = categories.get(pos);
                         inventory.addItem(createCategoryInv(category, null), (player, slot, item) -> {
-                            inventories.get(category.getId() + "|1").open((Player) player);
+                            inventories.get(category.getId() + "|1").open(player);
                             return true;
                         });
                     }
 
                     if (i > 1) {
-                        inventory.setItem(45, previousPageItem);
+                        int invNr = i - 1;
+                        inventory.setItem(size, previousPageItem, (player, slot, item) -> {
+                            mainInventories.get(invNr).open(player);
+                            return true;
+                        });
                     }
 
                     if (i != invs) {
-                        inventory.setItem(53, nextPageItem);
+                        int invNr = i + 1;
+                        inventory.setItem(size + 8, nextPageItem, (player, slot, item) -> {
+                            mainInventories.get(invNr).open(player);
+                            return true;
+                        });
                     }
 
                     mainInventories.add(inventory);
                 }
             } else {
-                mainInventories.add(new InventoryGUI(guiLayoutConfig.getCategoryListTile(), 54, true));
+                mainInventories.add(new InventoryGUI(guiLayoutConfig.getCategoryListTile(), size + 9, true));
             }
 
             for (InventoryGUI inventory : mainInventories) {
-                for (int i = 45; i < 54; i++) {
+                for (int i = size; i < size + 9; i++) {
                     if (inventory.getItem(i) == null) {
                         inventory.setItem(i, fillItem);
                     }
                 }
 
-                inventory.setItem(49, closeItem, (player, slot, item) -> {
+                inventory.setItem(size + 4, closeItem, (player, slot, item) -> {
                     player.closeInventory();
                     return true;
                 });
@@ -107,7 +124,7 @@ public class InventoryManager {
     }
 
     public void open(Player player) {
-        if (plugin.isAuthenticated()) {
+        if (MCMarket.isAuthenticated()) {
             if (mainInventories.size() > 0) {
                 mainInventories.get(0).open(player);
             } else {
@@ -118,67 +135,105 @@ public class InventoryManager {
         }
     }
 
-    private ItemStack createCategoryInv(MCMarketApi.Category category, String parent) {
+    private ItemStack createCategoryInv(Category category, String parent) {
         GUILayoutConfig guiLayoutConfig = plugin.getGUILayoutConfig();
+
+        int size = guiLayoutConfig.getGuiRows() * 9;
+        if (size < 9) {
+            size = 9;
+        }
 
         int totalSlots = category.getItems().size();
         if (category.getSubCategories().size() > 0) {
             totalSlots = Utils.roundUp(category.getSubCategories().size(), 9) + category.getItems().size();
         }
-        int invs = Utils.roundUp(totalSlots, 45) / 45;
+        int invs = Utils.roundUp(totalSlots, size) / size;
 
-        for (int i = 1; i <= invs; i++) {
-            InventoryGUI inventory = new InventoryGUI(replaceVars(guiLayoutConfig.getItemListTile(), category, null), 54, true);
+        if (invs > 0) {
+            for (int i = 1; i <= invs; i++) {
+                InventoryGUI inventory = new InventoryGUI(replaceVars(guiLayoutConfig.getItemListTile(), category, null), size + 9, true);
 
-            for (int pos = (45 * i) - 45; pos < totalSlots && pos < 45 * i; pos++) {
-                if (category.getSubCategories().size() > 0 && pos < Utils.roundUp(category.getSubCategories().size(), 9)) {
-                    if (pos < category.getSubCategories().size()) {
-                        MCMarketApi.Category subCategory = category.getSubCategories().get(pos);
-                        inventory.addItem(createCategoryInv(subCategory, category.getId() + "|" + i), (player, slot, item) -> {
-                            inventories.get(subCategory.getId() + "|1").open((Player) player);
-                            return true;
-                        });
+                for (int pos = (size * i) - size; pos < totalSlots && pos < size * i; pos++) {
+                    if (category.getSubCategories().size() > 0 && pos < Utils.roundUp(category.getSubCategories().size(), 9)) {
+                        if (pos < category.getSubCategories().size()) {
+                            Category subCategory = category.getSubCategories().get(pos);
+                            inventory.addItem(createCategoryInv(subCategory, category.getId() + "|" + i), (player, slot, item) -> {
+                                inventories.get(subCategory.getId() + "|1").open(player);
+                                return true;
+                            });
+                        }
+                        continue;
                     }
-                    continue;
+
+                    int itemPos = pos;
+                    int itemSlot = pos;
+                    if (category.getSubCategories().size() > 0) {
+                        itemPos = pos - Utils.roundUp(category.getSubCategories().size(), 9);
+                        if (i > (Utils.roundUp(Utils.roundUp(category.getSubCategories().size(), 9), size) / size)) {
+                            itemSlot = pos - ((i - 1) * size);
+                        }
+                    }
+
+                    Item item = category.getItems().get(itemPos);
+                    ItemStackBuilder itemIcon = getItemFromString(item.getIcon());
+                    if (itemIcon == null) itemIcon = new ItemStackBuilder(Material.CHEST);
+                    itemIcon.withName(replaceVars(guiLayoutConfig.getItemName(), category, item));
+                    for (String lines : guiLayoutConfig.getItemLore()) {
+                        for (String line : replaceVars(lines, category, item).split("\r\n")) {
+                            itemIcon.withLore(line);
+                        }
+                    }
+
+                    inventory.setItem(itemSlot, itemIcon.build(), (player, slot, itemStack) -> {
+                        player.closeInventory();
+                        player.sendMessage(Colors.color(I18n.tl("prefix") + " " + I18n.tl("gui_item_url", item.getUrl())));
+                        return true;
+                    });
                 }
 
-                int itemPos = pos;
-                if (category.getSubCategories().size() > 0) {
-                    itemPos = pos - Utils.roundUp(category.getSubCategories().size(), 9);
+                if (i > 1) {
+                    int invNr = i - 1;
+                    inventory.setItem(size, previousPageItem, (player, slot, item) -> {
+                        inventories.get(category.getId() + "|" + invNr).open(player);
+                        return true;
+                    });
                 }
 
-                MCMarketApi.Item item = category.getItems().get(itemPos);
-                ItemStackBuilder itemIcon = getItemFromString(item.getIcon());
-                if (itemIcon == null) itemIcon = new ItemStackBuilder(Material.CHEST);
-                itemIcon.withName(replaceVars(guiLayoutConfig.getItemName(), category, item));
-                for (String lines : guiLayoutConfig.getItemLore()) {
-                    for (String line : replaceVars(lines, category, item).split("\r\n")) {
-                        itemIcon.withLore(line);
+                if (i != invs) {
+                    int invNr = i + 1;
+                    inventory.setItem(size + 8, nextPageItem, (player, slot, item) -> {
+                        inventories.get(category.getId() + "|" + invNr).open(player);
+                        return true;
+                    });
+                }
+
+                for (int pos = size; pos < size + 9; pos++) {
+                    if (inventory.getItem(pos) == null) {
+                        inventory.setItem(pos, fillItem);
                     }
                 }
 
-                inventory.setItem(pos, itemIcon.build(), (player, slot, itemStack) -> {
-                    player.closeInventory();
-                    player.sendMessage(Colors.color(I18n.tl("prefix") + " " + I18n.tl("gui_item_url", item.getUrl())));
+                inventory.setItem(size + 4, backItem, (player, slot, item) -> {
+                    if (parent != null) {
+                        inventories.get(parent).open(player);
+                    } else {
+                        open(player);
+                    }
                     return true;
                 });
-            }
 
-            if (i > 1) {
-                inventory.setItem(45, previousPageItem);
+                inventories.put(category.getId() + "|" + i, inventory);
             }
+        } else {
+            InventoryGUI inventory = new InventoryGUI(replaceVars(guiLayoutConfig.getItemListTile(), category, null), size + 9, true);
 
-            if (i != invs) {
-                inventory.setItem(53, nextPageItem);
-            }
-
-            for (int pos = 45; pos < 54; pos++) {
+            for (int pos = size; pos < size + 9; pos++) {
                 if (inventory.getItem(pos) == null) {
                     inventory.setItem(pos, fillItem);
                 }
             }
 
-            inventory.setItem(49, backItem, (player, slot, item) -> {
+            inventory.setItem(size + 4, backItem, (player, slot, item) -> {
                 if (parent != null) {
                     inventories.get(parent).open(player);
                 } else {
@@ -187,7 +242,7 @@ public class InventoryManager {
                 return true;
             });
 
-            inventories.put(category.getId() + "|" + i, inventory);
+            inventories.put(category.getId() + "|1", inventory);
         }
 
         ItemStackBuilder catItem = getItemFromString(category.getIcon());
@@ -219,7 +274,7 @@ public class InventoryManager {
         return itemBuilder;
     }
 
-    private String replaceVars(String msg, MCMarketApi.Category category, MCMarketApi.Item item) {
+    private String replaceVars(String msg, Category category, Item item) {
         if (market != null) {
             msg = msg.replace("{market_id}", "" + market.getId())
                     .replace("{market_name}", market.getName())

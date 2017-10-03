@@ -12,6 +12,9 @@ commands:
     description: Manage plugin functionalities
     aliases: [mm]
     usage: /<command> <args>
+  MMGui:
+    description: Open MinecraftMarket GUI
+    usage: /<command>
 
 permissions:
   minecraftmarket.use:

@@ -7,6 +7,7 @@ import cn.nukkit.item.Item;
 import cn.nukkit.scheduler.AsyncTask;
 import cn.nukkit.scheduler.NukkitRunnable;
 import com.minecraftmarket.minecraftmarket.common.api.MCMarketApi;
+import com.minecraftmarket.minecraftmarket.common.api.models.Command;
 import com.minecraftmarket.minecraftmarket.nukkit.MCMarket;
 
 import java.util.Arrays;
@@ -32,16 +33,16 @@ public class PurchasesTask extends AsyncTask {
     }
 
     public void updatePurchases() {
-        if (plugin.isAuthenticated()) {
+        if (MCMarket.isAuthenticated()) {
             for (MCMarketApi.CommandType commandType : commandTypes) {
-                for (MCMarketApi.Command command : plugin.getApi().getCommands(MCMarketApi.CommandStatus.NOT_EXECUTED, commandType)) {
+                for (Command command : MCMarket.getApi().getCommands(commandType, 1, 2)) {
                     runCommand(command);
                 }
             }
         }
     }
 
-    private void runCommand(MCMarketApi.Command command) {
+    private void runCommand(Command command) {
         Player player = Server.getInstance().getPlayerExact(command.getPlayer().getName());
         boolean shouldExecute = true;
         if (command.isRequiredOnline() && (player == null || !player.isOnline())) {
@@ -76,7 +77,7 @@ public class PurchasesTask extends AsyncTask {
                         }
                     }
                 }, command.getDelay() > 0 ? (int) (20 * command.getDelay()) : 1, true);
-                plugin.getApi().setExecuted(command.getId());
+                MCMarket.getApi().setExecuted(command.getId());
             }
         }
     }

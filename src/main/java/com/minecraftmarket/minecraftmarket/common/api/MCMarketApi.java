@@ -1,15 +1,22 @@
 package com.minecraftmarket.minecraftmarket.common.api;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.minecraftmarket.minecraftmarket.common.api.models.*;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
-public abstract class MCMarketApi {
+public class MCMarketApi {
     private final String BASE_URL = "https://www.minecraftmarket.com/api/v1/plugin/";
+    private final ObjectMapper MAPPER = new ObjectMapper();
     private final String API_KEY;
     private final String USER_AGENT;
     protected final boolean DEBUG;
@@ -32,31 +39,443 @@ public abstract class MCMarketApi {
         return USER_AGENT;
     }
 
-    public abstract boolean authAPI();
+    public boolean authAPI() {
+        try {
+            makeRequest("/market", "GET", "");
+            return true;
+        } catch (IOException e) {
+            if (DEBUG) {
+                e.printStackTrace();
+            }
+        }
+        return false;
+    }
 
-    public abstract Market getMarket();
+    public Market getMarket() {
+        try {
+            BufferedReader reader = makeRequest("/market", "GET", "");
+            return MAPPER.readValue(reader, Market.class);
+        } catch (Exception e) {
+            if (DEBUG) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
 
-    public abstract List<Category> getCategories();
+    public long getCategoriesCount() {
+        try {
+            BufferedReader reader = makeRequest("/categories", "GET", "");
+            JsonNode response = MAPPER.readTree(reader);
+            return response.get("count").asLong();
+        } catch (Exception e) {
+            if (DEBUG) {
+                e.printStackTrace();
+            }
+        }
+        return 0;
+    }
 
-    public abstract Category getCategory(long categoryID);
+    public List<Category> getCategories() {
+        return getCategories(1, 0);
+    }
 
-    public abstract List<Item> getItems();
+    public List<Category> getCategories(int startPage, int maxPages) {
+        List<Category> categories = new ArrayList<>();
+        try {
+            BufferedReader reader = makeRequest("/categories", "GET", "&limit=25");
+            JsonNode response = MAPPER.readTree(reader);
+            long count = response.get("count").asLong();
+            long pages = (count / 25) + 1;
 
-    public abstract Item getItem(long itemID);
+            if (startPage <= pages) {
+                pages = pages - (startPage - 1);
+            } else throw new IndexOutOfBoundsException("startPage exceeds the total amount of pages.");
 
-    public abstract List<Transaction> getTransactions(Filter filter);
+            if (maxPages > 0 && pages > maxPages) {
+                pages = maxPages;
+            }
 
-    public abstract Transaction getTransaction(long transactionID);
+            for (int i = startPage; i <= pages; i++) {
+                if (i > 1) {
+                    reader = makeRequest("/categories", "GET", "&limit=25&offset=" + (25 * (i - 1)));
+                    response = MAPPER.readTree(reader);
+                }
 
-    public abstract List<Purchase> getPurchases();
+                Iterator<JsonNode> results = response.get("results").elements();
+                while (results.hasNext()) {
+                    JsonNode result = results.next();
+                    Category category = getCategory(result.get("id").asLong());
+                    if (category != null) {
+                        categories.add(category);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            if (DEBUG) {
+                e.printStackTrace();
+            }
+        }
+        return categories;
+    }
 
-    public abstract Purchase getPurchase(long purchaseID);
+    public Category getCategory(long categoryID) {
+        try {
+            BufferedReader reader = makeRequest(String.format("/categories/%s", categoryID), "GET", "");
+            JsonNode response = MAPPER.readTree(reader);
+            long id = response.get("id").asLong();
+            String name = (String) response.get("name").asText();
+            String description = (String) response.get("gui_description").asText();
+            String icon = (String) response.get("gui_icon").asText();
+            long order = (Long) response.get("order").asLong();
 
-    public abstract List<Command> getCommands(Filter... filters);
+            List<Category> subCategories = new ArrayList<>();
+            Iterator<JsonNode> subCategoriesResult = response.get("subcategories").elements();
+            while (subCategoriesResult.hasNext()) {
+                JsonNode subCategory = subCategoriesResult.next();
+                Category category = getCategory(subCategory.get("id").asLong());
+                if (category != null) {
+                    subCategories.add(category);
+                }
+            }
 
-    public abstract Command getCommand(long commandID);
+            return new Category(id, name, description, icon, subCategories, getItems(id), order);
+        } catch (Exception e) {
+            if (DEBUG) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
 
-    public abstract void setExecuted(long commandID);
+    public long getItemsCount() {
+        return getItemsCount(0);
+    }
+
+    public long getItemsCount(long categoryID) {
+        try {
+            BufferedReader reader = makeRequest("/items", "GET", categoryID > 0 ? "&category=" + categoryID : "");
+            JsonNode response = MAPPER.readTree(reader);
+            return response.get("count").asLong();
+        } catch (Exception e) {
+            if (DEBUG) {
+                e.printStackTrace();
+            }
+        }
+        return 0;
+    }
+
+    public List<Item> getItems() {
+        return getItems(0);
+    }
+
+    public List<Item> getItems(long categoryID) {
+        return getItems(categoryID, 1, 0);
+    }
+
+    public List<Item> getItems(long categoryID, int startPage, int maxPages) {
+        List<Item> items = new ArrayList<>();
+        try {
+            BufferedReader reader = makeRequest("/items", "GET", "&limit=25" + (categoryID > 0 ? "&category=" + categoryID : ""));
+            JsonNode response = MAPPER.readTree(reader);
+            long count = response.get("count").asLong();
+            long pages = (count / 25) + 1;
+
+            if (startPage <= pages) {
+                pages = pages - (startPage - 1);
+            } else throw new IndexOutOfBoundsException("startPage exceeds the total amount of pages.");
+
+            if (maxPages > 0 && pages > maxPages) {
+                pages = maxPages;
+            }
+
+            for (int i = startPage; i <= pages; i++) {
+                if (i > 1) {
+                    reader = makeRequest("/items", "GET", "&limit=25&offset=" + (25 * (i - 1)) + (categoryID > 0 ? "&category=" + categoryID : ""));
+                    response = MAPPER.readTree(reader);
+                }
+
+                Iterator<JsonNode> results = response.get("results").elements();
+                while (results.hasNext()) {
+                    JsonNode result = results.next();
+                    items.add(MAPPER.readValue(result.toString(), Item.class));
+                }
+            }
+        } catch (Exception e) {
+            if (DEBUG) {
+                e.printStackTrace();
+            }
+        }
+        return items;
+    }
+
+    public Item getItem(long itemID) {
+        try {
+            BufferedReader reader = makeRequest(String.format("/items/%s", itemID), "GET", "");
+            return MAPPER.readValue(reader, Item.class);
+        } catch (Exception e) {
+            if (DEBUG) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+
+    public long getTransactionsCount() {
+        return getTransactionsCount(null);
+    }
+
+    public long getTransactionsCount(TransactionStatus transactionStatus) {
+        try {
+            String query = buildQueryFromFilter(transactionStatus);
+            BufferedReader reader = makeRequest("/transactions", "GET", query);
+            JsonNode response = MAPPER.readTree(reader);
+            return response.get("count").asLong();
+        } catch (Exception e) {
+            if (DEBUG) {
+                e.printStackTrace();
+            }
+        }
+        return 0;
+    }
+
+    public List<Transaction> getTransactions() {
+        return getTransactions(1,0);
+    };
+
+    public List<Transaction> getTransactions(int startPage, int maxPages) {
+        return getTransactions(null, startPage, maxPages);
+    }
+
+    public List<Transaction> getTransactions(TransactionStatus transactionStatus) {
+        return getTransactions(transactionStatus, 1, 0);
+    }
+
+    public List<Transaction> getTransactions(TransactionStatus transactionStatus, int startPage, int maxPages) {
+        List<Transaction> transactions = new ArrayList<>();
+        try {
+            String query = buildQueryFromFilter(transactionStatus);
+            BufferedReader reader = makeRequest("/transactions", "GET", "&limit=25" + query);
+            JsonNode response = MAPPER.readTree(reader);
+            long count = response.get("count").asLong();
+            long pages = (count / 25) + 1;
+
+            if (startPage <= pages) {
+                pages = pages - (startPage - 1);
+            } else throw new IndexOutOfBoundsException("startPage exceeds the total amount of pages.");
+
+            if (maxPages > 0 && pages > maxPages) {
+                pages = maxPages;
+            }
+
+            for (int i = startPage; i <= pages; i++) {
+                if (i > 1) {
+                    reader = makeRequest("/transactions", "GET", "&limit=25&offset=" + (25 * (i - 1)) + query);
+                    response = MAPPER.readTree(reader);
+                }
+
+                Iterator<JsonNode> results = response.get("results").elements();
+                while (results.hasNext()) {
+                    JsonNode result = results.next();
+                    Transaction transaction = getTransaction(result.get("id").asLong());
+                    if (transaction != null) {
+                        transactions.add(transaction);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            if (DEBUG) {
+                e.printStackTrace();
+            }
+        }
+        return transactions;
+    }
+
+    public Transaction getTransaction(long transactionID) {
+        try {
+            BufferedReader reader = makeRequest(String.format("/transactions/%s", transactionID), "GET", "");
+            JsonNode response = MAPPER.readTree(reader);
+            long id = response.get("id").asLong();
+            String status = response.get("status").asText();
+            String gateway = response.get("gateway").asText();
+            String transaction_id = response.get("transaction_id").asText();
+            String price = response.get("price").asText();
+            String date = response.get("date").asText();
+            
+            Currency currency = MAPPER.readValue(response.get("currency").toString(), Currency.class);
+            MMPlayer player = MAPPER.readValue(response.get("player").toString(), MMPlayer.class);
+
+            List<Purchase> purchases = new ArrayList<>();
+            Iterator<JsonNode> purchasesResult = response.get("purchases").elements();
+            while (purchasesResult.hasNext()) {
+                Purchase purchase = getPurchase(purchasesResult.next().get("id").asLong());
+                if (purchase != null) {
+                    purchases.add(purchase);
+                }
+            }
+
+            return new Transaction(id, status, gateway, transaction_id, price, currency, date, player, purchases);
+        } catch (Exception e) {
+            if (DEBUG) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+
+    public long getPurchasesCount() {
+        try {
+            BufferedReader reader = makeRequest("/purchases", "GET", "");
+            JsonNode response = MAPPER.readTree(reader);
+            return response.get("count").asLong();
+        } catch (Exception e) {
+            if (DEBUG) {
+                e.printStackTrace();
+            }
+        }
+        return 0;
+    }
+
+    public List<Purchase> getPurchases() {
+        return getPurchases(1, 0);
+    }
+
+    public List<Purchase> getPurchases(int startPage, int maxPages) {
+        List<Purchase> purchases = new ArrayList<>();
+        try {
+            BufferedReader reader = makeRequest("/purchases", "GET", "&limit=25");
+            JsonNode response = MAPPER.readTree(reader);
+            long count = response.get("count").asLong();
+            long pages = (count / 25) + 1;
+
+            if (startPage <= pages) {
+                pages = pages - (startPage - 1);
+            } else throw new IndexOutOfBoundsException("startPage exceeds the total amount of pages.");
+
+            if (maxPages > 0 && pages > maxPages) {
+                pages = maxPages;
+            }
+
+            for (int i = startPage; i <= pages; i++) {
+                if (i > 1) {
+                    reader = makeRequest("/purchases", "GET", "&limit=25&offset=" + (25 * (i - 1)));
+                    response = MAPPER.readTree(reader);
+                }
+
+                Iterator<JsonNode> results = response.get("results").elements();
+                while (results.hasNext()) {
+                    JsonNode result = results.next();
+                    purchases.add(MAPPER.readValue(result.toString(), Purchase.class));
+                }
+            }
+        } catch (Exception e) {
+            if (DEBUG) {
+                e.printStackTrace();
+            }
+        }
+        return purchases;
+    }
+
+    public Purchase getPurchase(long purchaseID) {
+        try {
+            BufferedReader reader = makeRequest(String.format("/purchases/%s", purchaseID), "GET", "");
+            return MAPPER.readValue(reader, Purchase.class);
+        } catch (Exception e) {
+            if (DEBUG) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+
+    public long getCommandsCount() {
+        return getCommandsCount(null);
+    }
+
+    public long getCommandsCount(CommandType commandType) {
+        try {
+            String query = buildQueryFromFilter(commandType);
+            BufferedReader reader = makeRequest("/commands", "GET", query);
+            JsonNode response = MAPPER.readTree(reader);
+            return response.get("count").asLong();
+        } catch (Exception e) {
+            if (DEBUG) {
+                e.printStackTrace();
+            }
+        }
+        return 0;
+    }
+
+    public List<Command> getCommands() {
+        return getCommands(1, 0);
+    };
+
+    public List<Command> getCommands(int startPage, int maxPages) {
+        return getCommands(null, startPage, maxPages);
+    };
+
+    public List<Command> getCommands(CommandType commandType) {
+        return getCommands(commandType, 1, 0);
+    };
+
+    public List<Command> getCommands(CommandType commandType, int startPage, int maxPages) {
+        List<Command> commands = new ArrayList<>();
+        try {
+            String query = buildQueryFromFilter(commandType);
+            BufferedReader reader = makeRequest("/commands", "GET", "&limit=25" + query);
+            JsonNode response = MAPPER.readTree(reader);
+            long count = response.get("count").asLong();
+            long pages = (count / 25) + 1;
+
+            if (startPage <= pages) {
+                pages = pages - (startPage - 1);
+            } else throw new IndexOutOfBoundsException("startPage exceeds the total amount of pages.");
+
+            if (maxPages > 0 && pages > maxPages) {
+                pages = maxPages;
+            }
+
+            for (int i = startPage; i <= pages; i++) {
+                if (i > 1) {
+                    reader = makeRequest("/commands", "GET", "&limit=25&offset=" + (25 * (i - 1)) + query);
+                    response = MAPPER.readTree(reader);
+                }
+
+                Iterator<JsonNode> results = response.get("results").elements();
+                while (results.hasNext()) {
+                    JsonNode result = results.next();
+                    commands.add(MAPPER.readValue(result.toString(), Command.class));
+                }
+            }
+        } catch (Exception e) {
+            if (DEBUG) {
+                e.printStackTrace();
+            }
+        }
+        return commands;
+    }
+
+    public Command getCommand(long commandID) {
+        try {
+            BufferedReader reader = makeRequest(String.format("/commands/%s", commandID), "GET", "");
+            return MAPPER.readValue(reader, Command.class);
+        } catch (Exception e) {
+            if (DEBUG) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+
+    public void setExecuted(long commandID) {
+        try {
+            makeRequest(String.format("/commands/%s", commandID), "PUT", "{\"executed\":1}");
+        } catch (IOException e) {
+            if (DEBUG) {
+                e.printStackTrace();
+            }
+        }
+    }
 
     protected BufferedReader makeRequest(String url, String method, String query) throws IOException {
         HttpURLConnection conn;
@@ -64,7 +483,7 @@ public abstract class MCMarketApi {
             conn = (HttpURLConnection) new URL(BASE_URL + API_KEY + url + "/?format=json").openConnection();
             conn.setRequestMethod("PUT");
         } else {
-            conn = (HttpURLConnection) new URL(BASE_URL + API_KEY + url + "/?format=json&" + query).openConnection();
+            conn = (HttpURLConnection) new URL(BASE_URL + API_KEY + url + "/?format=json" + query).openConnection();
             conn.setRequestMethod("GET");
         }
         conn.setRequestProperty("Content-Type", "application/json");
@@ -83,387 +502,11 @@ public abstract class MCMarketApi {
         return new BufferedReader(new InputStreamReader(conn.getInputStream()));
     }
 
-    protected String buildQueryFromFilters(Filter... filters) {
-        StringBuilder builder = new StringBuilder();
-        for (Filter filter : filters) {
-            if (builder.length() != 0) builder.append("&");
-            builder.append(filter.getName())
-                    .append("=")
-                    .append(filter.getValue());
+    protected String buildQueryFromFilter(Filter filter) {
+        if (filter != null) {
+            return "&" + filter.getName() + "=" + filter.getValue();
         }
-        return builder.toString();
-    }
-
-    public class Market {
-        private final long id;
-        private final String name;
-        private final Currency currency;
-        private final String url;
-
-        public Market(long id, String name, Currency currency, String url) {
-            this.id = id;
-            this.name = name;
-            this.currency = currency;
-            this.url = url;
-        }
-
-        public long getId() {
-            return id;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public Currency getCurrency() {
-            return currency;
-        }
-
-        public String getUrl() {
-            return url;
-        }
-    }
-
-    public class Category {
-        private final long id;
-        private final String name;
-        private final String description;
-        private final String icon;
-        private final List<Category> subCategories;
-        private final List<Item> items;
-        private final long order;
-
-        public Category(long id, String name, String description, String icon, List<Category> subCategories, List<Item> items, long order) {
-            this.id = id;
-            this.name = name;
-            this.description = description;
-            this.icon = icon;
-            this.subCategories = subCategories;
-            this.items = items;
-            this.order = order;
-        }
-
-        public long getId() {
-            return id;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public String getDescription() {
-            return description;
-        }
-
-        public String getIcon() {
-            return icon;
-        }
-
-        public List<Category> getSubCategories() {
-            return subCategories;
-        }
-
-        public List<Item> getItems() {
-            return items;
-        }
-
-        public long getOrder() {
-            return order;
-        }
-    }
-
-    public class Item {
-        private final long id;
-        private final String name;
-        private final String description;
-        private final String icon;
-        private final String url;
-        private final String price;
-        private final long order;
-
-        public Item(long id, String name, String description, String icon, String url, String price, long order) {
-            this.id = id;
-            this.name = name;
-            this.description = description;
-            this.icon = icon;
-            this.url = url;
-            this.price = price;
-            this.order = order;
-        }
-
-        public long getId() {
-            return id;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public String getDescription() {
-            return description;
-        }
-
-        public String getIcon() {
-            return icon;
-        }
-
-        public String getUrl() {
-            return url;
-        }
-
-        public String getPrice() {
-            return price;
-        }
-
-        public long getOrder() {
-            return order;
-        }
-    }
-
-    public class Transaction {
-        private final long id;
-        private final String status;
-        private final String gateway;
-        private final String transactionID;
-        private final String price;
-        private final Currency currency;
-        private final String date;
-        private final MMPlayer player;
-        private final List<Purchase> purchases;
-
-        public Transaction(long id, String status, String gateway, String transactionID, String price, Currency currency, String date, MMPlayer player, List<Purchase> purchases) {
-            this.id = id;
-            this.status = status;
-            this.gateway = gateway;
-            this.transactionID = transactionID;
-            this.price = price;
-            this.currency = currency;
-            this.date = date;
-            this.player = player;
-            this.purchases = purchases;
-        }
-
-        public long getId() {
-            return id;
-        }
-
-        public String getStatus() {
-            return status;
-        }
-
-        public String getGateway() {
-            return gateway;
-        }
-
-        public String getTransactionID() {
-            return transactionID;
-        }
-
-        public String getPrice() {
-            return price;
-        }
-
-        public Currency getCurrency() {
-            return currency;
-        }
-
-        public String getDate() {
-            return date;
-        }
-
-        public MMPlayer getPlayer() {
-            return player;
-        }
-
-        public List<Purchase> getPurchases() {
-            return purchases;
-        }
-    }
-
-    public class Purchase {
-        private final long id;
-        private final String name;
-        private final String price;
-        private final Currency currency;
-        private final String date;
-        private final MMPlayer player;
-
-        public Purchase(long id, String name, String price, Currency currency, String date, MMPlayer player) {
-            this.id = id;
-            this.name = name;
-            this.price = price;
-            this.currency = currency;
-            this.date = date;
-            this.player = player;
-        }
-
-        public long getId() {
-            return id;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public String getPrice() {
-            return price;
-        }
-
-        public Currency getCurrency() {
-            return currency;
-        }
-
-        public String getDate() {
-            return date;
-        }
-
-        public MMPlayer getPlayer() {
-            return player;
-        }
-    }
-
-    public class Command {
-        private final long id;
-        private final MMPlayer player;
-        private final String type;
-        private final String command;
-        private final long delay;
-        private final long requiredSlots;
-        private final boolean requiredOnline;
-        private final boolean repeat;
-        private final long repeatPeriod;
-        private final long repeatCycles;
-        private final boolean executed;
-
-        public Command(long id, MMPlayer player, String type, String command, long delay, long requiredSlots, boolean requiredOnline, boolean repeat, long repeatPeriod, long repeatCycles, boolean executed) {
-            this.id = id;
-            this.player = player;
-            this.type = type;
-            this.command = command;
-            this.delay = delay;
-            this.requiredSlots = requiredSlots;
-            this.requiredOnline = requiredOnline;
-            this.repeat = repeat;
-            this.repeatPeriod = repeatPeriod;
-            this.repeatCycles = repeatCycles;
-            this.executed = executed;
-        }
-
-        public long getId() {
-            return id;
-        }
-
-        public MMPlayer getPlayer() {
-            return player;
-        }
-
-        public String getType() {
-            return type;
-        }
-
-        public String getCommand() {
-            return command;
-        }
-
-        public long getDelay() {
-            return delay;
-        }
-
-        public long getRequiredSlots() {
-            return requiredSlots;
-        }
-
-        public boolean isRequiredOnline() {
-            return requiredOnline;
-        }
-
-        public boolean isRepeat() {
-            return repeat;
-        }
-
-        public long getRepeatPeriod() {
-            return repeatPeriod;
-        }
-
-        public long getRepeatCycles() {
-            return repeatCycles;
-        }
-
-        public boolean isExecuted() {
-            return executed;
-        }
-    }
-
-    public class MMPlayer {
-        private final long id;
-        private final String name;
-        private final String uuid;
-        private final boolean verified;
-        private final String skinUrl;
-        private final String skinSource;
-        private final String capeUrl;
-        private final String capeSource;
-
-        public MMPlayer(long id, String name, String uuid, boolean verified, String skinUrl, String skinSource, String capeUrl, String capeSource) {
-            this.id = id;
-            this.name = name;
-            this.uuid = uuid;
-            this.verified = verified;
-            this.skinUrl = skinUrl;
-            this.skinSource = skinSource;
-            this.capeUrl = capeUrl;
-            this.capeSource = capeSource;
-        }
-
-        public long getId() {
-            return id;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public String getUuid() {
-            return uuid;
-        }
-
-        public boolean isVerified() {
-            return verified;
-        }
-
-        public String getSkinUrl() {
-            return skinUrl;
-        }
-
-        public String getSkinSource() {
-            return skinSource;
-        }
-
-        public String getCapeUrl() {
-            return capeUrl;
-        }
-
-        public String getCapeSource() {
-            return capeSource;
-        }
-    }
-
-    public class Currency {
-        private final long id;
-        private final String code;
-
-        public Currency(long id, String code) {
-            this.id = id;
-            this.code = code;
-        }
-
-        public long getId() {
-            return id;
-        }
-
-        public String getCode() {
-            return code;
-        }
+        return "";
     }
 
     public enum TransactionStatus implements Filter {

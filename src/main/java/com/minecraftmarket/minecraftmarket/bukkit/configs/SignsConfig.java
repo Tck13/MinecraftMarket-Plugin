@@ -129,6 +129,9 @@ public class SignsConfig extends ConfigFile {
         }
 
         World w = Bukkit.getServer().getWorld(a[0]);
+        if (w == null) {
+            return null;
+        }
 
         double x = Double.parseDouble(a[1]);
         double y = Double.parseDouble(a[2]);

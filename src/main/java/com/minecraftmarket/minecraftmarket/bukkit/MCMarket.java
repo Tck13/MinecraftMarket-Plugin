@@ -1,6 +1,7 @@
 package com.minecraftmarket.minecraftmarket.bukkit;
 
 import com.minecraftmarket.minecraftmarket.bukkit.commands.MMCmd;
+import com.minecraftmarket.minecraftmarket.bukkit.commands.MMGui;
 import com.minecraftmarket.minecraftmarket.bukkit.configs.GUILayoutConfig;
 import com.minecraftmarket.minecraftmarket.bukkit.configs.MainConfig;
 import com.minecraftmarket.minecraftmarket.bukkit.configs.SignsConfig;
@@ -12,7 +13,6 @@ import com.minecraftmarket.minecraftmarket.bukkit.tasks.PurchasesTask;
 import com.minecraftmarket.minecraftmarket.bukkit.tasks.SignsTask;
 import com.minecraftmarket.minecraftmarket.bukkit.utils.inventories.InventoryGUI;
 import com.minecraftmarket.minecraftmarket.bukkit.utils.updater.Updater;
-import com.minecraftmarket.minecraftmarket.common.api.MCMApi;
 import com.minecraftmarket.minecraftmarket.common.api.MCMarketApi;
 import com.minecraftmarket.minecraftmarket.common.i18n.I18n;
 import com.minecraftmarket.minecraftmarket.common.metrics.BukkitMetrics;
@@ -28,7 +28,8 @@ public final class MCMarket extends JavaPlugin {
     private SignsConfig signsConfig;
     private GUILayoutConfig guiLayoutConfig;
     private SignsLayoutConfig signsLayoutConfig;
-    private boolean authenticated;
+    private static MCMarketApi marketApi;
+    private static boolean authenticated;
     private InventoryManager inventoryManager;
     private SignsTask signsTask;
     private PurchasesTask purchasesTask;
@@ -41,6 +42,7 @@ public final class MCMarket extends JavaPlugin {
         reloadConfigs(null);
 
         getCommand("MinecraftMarket").setExecutor(new MMCmd(this));
+        getCommand("MMGui").setExecutor(new MMGui(this));
 
         new BukkitMetrics(this);
         new Updater(this, 44031, pluginURL -> {
@@ -80,14 +82,14 @@ public final class MCMarket extends JavaPlugin {
                 if (signsTask == null) {
                     signsTask = new SignsTask(MCMarket.this);
                 }
-                getServer().getScheduler().runTaskTimer(MCMarket.this, signsTask, 20 * 10, 20 * 60 * mainConfig.getCheckInterval());
+                getServer().getScheduler().runTaskTimer(MCMarket.this, signsTask, 20 * 10, mainConfig.getCheckInterval() > 0 ? 20 * 60 * mainConfig.getCheckInterval() : 20 * 60);
                 getServer().getPluginManager().registerEvents(new SignsListener(MCMarket.this), MCMarket.this);
             }
 
             if (purchasesTask == null) {
                 purchasesTask = new PurchasesTask(MCMarket.this);
             }
-            getServer().getScheduler().runTaskTimerAsynchronously(MCMarket.this, purchasesTask, 20 * 10, 20 * 60 * mainConfig.getCheckInterval());
+            getServer().getScheduler().runTaskTimerAsynchronously(MCMarket.this, purchasesTask, 20 * 10, mainConfig.getCheckInterval() > 0 ? 20 * 60 * mainConfig.getCheckInterval() : 20 * 60);
 
             if (response != null) {
                 response.done(result);
@@ -100,8 +102,8 @@ public final class MCMarket extends JavaPlugin {
             mainConfig.setApiKey(apiKey);
         }
         getServer().getScheduler().runTaskAsynchronously(this, () -> {
-            new MCMApi(apiKey, mainConfig.isDebug(), MCMApi.ApiType.JSON, getUserAgent());
-            authenticated = getApi().authAPI();
+            marketApi = new MCMarketApi(apiKey, getUserAgent(), mainConfig.isDebug());
+            authenticated = marketApi.authAPI();
             if (!authenticated) {
                 getLogger().warning(I18n.tl("invalid_key", "/MM apiKey <key>"));
             }
@@ -130,11 +132,11 @@ public final class MCMarket extends JavaPlugin {
         return signsLayoutConfig;
     }
 
-    public MCMarketApi getApi() {
-        return MCMApi.getMarketApi();
+    public static MCMarketApi getApi() {
+        return marketApi;
     }
 
-    public boolean isAuthenticated() {
+    public static boolean isAuthenticated() {
         return authenticated;
     }
 

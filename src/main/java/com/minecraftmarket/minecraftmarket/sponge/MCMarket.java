@@ -1,7 +1,6 @@
 package com.minecraftmarket.minecraftmarket.sponge;
 
 import com.google.inject.Inject;
-import com.minecraftmarket.minecraftmarket.common.api.MCMApi;
 import com.minecraftmarket.minecraftmarket.common.api.MCMarketApi;
 import com.minecraftmarket.minecraftmarket.common.i18n.I18n;
 import com.minecraftmarket.minecraftmarket.common.metrics.SpongeMetrics;
@@ -37,7 +36,7 @@ import java.util.Optional;
 @Plugin(
         id = "minecraftmarket",
         name = "MinecraftMarket",
-        version = "3.4.2",
+        version = "3.5.0",
         description = "The #1 webstore platform for Minecraft servers",
         authors = "R4G3_BABY",
         url = "https://www.minecraftmarket.com"
@@ -57,7 +56,8 @@ public final class MCMarket {
     private MainConfig mainConfig;
     private SignsConfig signsConfig;
     private SignsLayoutConfig signsLayoutConfig;
-    private boolean authenticated;
+    private static MCMarketApi marketApi;
+    private static boolean authenticated;
     private SignsTask signsTask;
     private PurchasesTask purchasesTask;
 
@@ -114,14 +114,14 @@ public final class MCMarket {
                 if (signsTask == null) {
                     signsTask = new SignsTask(MCMarket.this);
                 }
-                Sponge.getScheduler().createTaskBuilder().delayTicks(20 * 10).intervalTicks(20 * 60 * mainConfig.getCheckInterval()).execute(signsTask).submit(MCMarket.this);
+                Sponge.getScheduler().createTaskBuilder().delayTicks(20 * 10).intervalTicks(mainConfig.getCheckInterval() > 0 ? 20 * 60 * mainConfig.getCheckInterval() : 20 * 60).execute(signsTask).submit(MCMarket.this);
                 Sponge.getEventManager().registerListeners(MCMarket.this, new SignsListener(MCMarket.this));
             }
 
             if (purchasesTask == null) {
                 purchasesTask = new PurchasesTask(MCMarket.this);
             }
-            Sponge.getScheduler().createTaskBuilder().async().delayTicks(20 * 10).intervalTicks(20 * 60 * mainConfig.getCheckInterval()).execute(purchasesTask).submit(MCMarket.this);
+            Sponge.getScheduler().createTaskBuilder().async().delayTicks(20 * 10).intervalTicks(mainConfig.getCheckInterval() > 0 ? 20 * 60 * mainConfig.getCheckInterval() : 20 * 60).execute(purchasesTask).submit(MCMarket.this);
 
             if (response != null) {
                 response.done(result);
@@ -135,8 +135,8 @@ public final class MCMarket {
         }
         if (Sponge.isServerAvailable()) {
             Sponge.getScheduler().createTaskBuilder().async().execute(() -> {
-                new MCMApi(apiKey, mainConfig.isDebug(), MCMApi.ApiType.GSON, getUserAgent());
-                authenticated = getApi().authAPI();
+                marketApi = new MCMarketApi(apiKey, getUserAgent(), mainConfig.isDebug());
+                authenticated = marketApi.authAPI();
                 if (!authenticated) {
                     logger.warn(I18n.tl("invalid_key", "/MM apiKey <key>"));
                 }
@@ -163,11 +163,11 @@ public final class MCMarket {
         return signsLayoutConfig;
     }
 
-    public MCMarketApi getApi() {
-        return MCMApi.getMarketApi();
+    public static MCMarketApi getApi() {
+        return marketApi;
     }
 
-    public boolean isAuthenticated() {
+    public static boolean isAuthenticated() {
         return authenticated;
     }
 

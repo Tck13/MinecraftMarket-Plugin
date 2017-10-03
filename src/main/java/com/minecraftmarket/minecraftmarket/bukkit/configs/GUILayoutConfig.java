@@ -7,6 +7,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.util.List;
 
 public class GUILayoutConfig extends ConfigFile {
+    private final int guiRows;
     private final String categoryListTile;
     private final String categoryName;
     private final List<String> categoryLore;
@@ -22,6 +23,7 @@ public class GUILayoutConfig extends ConfigFile {
     public GUILayoutConfig(JavaPlugin plugin) {
         super(plugin, "guiLayout");
 
+        guiRows = config.getInt("GUIRows");
         categoryListTile = Colors.color(config.getString("CategoryListTitle"));
         categoryName = Colors.color(config.getString("CategoryName"));
         categoryLore = Colors.colorList(config.getStringList("CategoryLore"));
@@ -33,6 +35,10 @@ public class GUILayoutConfig extends ConfigFile {
         bottomBackItem = config.getString("Bottom.BackItem");
         bottomPreviousPageItem = config.getString("Bottom.PreviousPageItem");
         bottomNextPageItem = config.getString("Bottom.NextPageItem");
+    }
+
+    public int getGuiRows() {
+        return guiRows;
     }
 
     public String getCategoryListTile() {

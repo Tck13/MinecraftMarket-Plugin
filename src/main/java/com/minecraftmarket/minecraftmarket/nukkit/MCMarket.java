@@ -6,7 +6,6 @@ import cn.nukkit.event.HandlerList;
 import cn.nukkit.plugin.PluginBase;
 import cn.nukkit.scheduler.AsyncTask;
 import cn.nukkit.utils.TextFormat;
-import com.minecraftmarket.minecraftmarket.common.api.MCMApi;
 import com.minecraftmarket.minecraftmarket.common.api.MCMarketApi;
 import com.minecraftmarket.minecraftmarket.common.i18n.I18n;
 import com.minecraftmarket.minecraftmarket.common.metrics.NukkitMetrics;
@@ -31,7 +30,8 @@ public final class MCMarket extends PluginBase {
     private MainConfig mainConfig;
     private SignsConfig signsConfig;
     private SignsLayoutConfig signsLayoutConfig;
-    private boolean authenticated;
+    private static MCMarketApi marketApi;
+    private static boolean authenticated;
     private SignsTask signsTask;
     private PurchasesTask purchasesTask;
 
@@ -100,14 +100,14 @@ public final class MCMarket extends PluginBase {
                 if (signsTask == null) {
                     signsTask = new SignsTask(MCMarket.this);
                 }
-                getServer().getScheduler().scheduleDelayedRepeatingTask(MCMarket.this, signsTask, 20 * 10, 20 * 60 * mainConfig.getCheckInterval());
+                getServer().getScheduler().scheduleDelayedRepeatingTask(MCMarket.this, signsTask, 20 * 10, mainConfig.getCheckInterval() > 0 ? 20 * 60 * mainConfig.getCheckInterval() : 20 * 60);
                 getServer().getPluginManager().registerEvents(new SignsListener(MCMarket.this), MCMarket.this);
             }
 
             if (purchasesTask == null) {
                 purchasesTask = new PurchasesTask(MCMarket.this);
             }
-            getServer().getScheduler().scheduleRepeatingTask(MCMarket.this, purchasesTask, 20 * 60 * mainConfig.getCheckInterval(), true);
+            getServer().getScheduler().scheduleRepeatingTask(MCMarket.this, purchasesTask, mainConfig.getCheckInterval() > 0 ? 20 * 60 * mainConfig.getCheckInterval() : 20 * 60, true);
 
             if (response != null) {
                 response.done(result);
@@ -122,8 +122,8 @@ public final class MCMarket extends PluginBase {
         getServer().getScheduler().scheduleAsyncTask(this, new AsyncTask() {
             @Override
             public void onRun() {
-                new MCMApi(apiKey, mainConfig.isDebug(), MCMApi.ApiType.GSON, getUserAgent());
-                authenticated = getApi().authAPI();
+                marketApi = new MCMarketApi(apiKey, getUserAgent(), mainConfig.isDebug());
+                authenticated = marketApi.authAPI();
                 if (!authenticated) {
                     getLogger().warning(I18n.tl("invalid_key", "/MM apiKey <key>"));
                 }
@@ -146,11 +146,11 @@ public final class MCMarket extends PluginBase {
         return signsLayoutConfig;
     }
 
-    public MCMarketApi getApi() {
-        return MCMApi.getMarketApi();
+    public static MCMarketApi getApi() {
+        return marketApi;
     }
 
-    public boolean isAuthenticated() {
+    public static boolean isAuthenticated() {
         return authenticated;
     }
 

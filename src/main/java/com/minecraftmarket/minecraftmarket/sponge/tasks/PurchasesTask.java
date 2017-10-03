@@ -1,6 +1,7 @@
 package com.minecraftmarket.minecraftmarket.sponge.tasks;
 
 import com.minecraftmarket.minecraftmarket.common.api.MCMarketApi;
+import com.minecraftmarket.minecraftmarket.common.api.models.Command;
 import com.minecraftmarket.minecraftmarket.sponge.MCMarket;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
@@ -33,16 +34,16 @@ public class PurchasesTask implements Runnable {
     }
 
     public void updatePurchases() {
-        if (plugin.isAuthenticated()) {
+        if (MCMarket.isAuthenticated()) {
             for (MCMarketApi.CommandType commandType : commandTypes) {
-                for (MCMarketApi.Command command : plugin.getApi().getCommands(MCMarketApi.CommandStatus.NOT_EXECUTED, commandType)) {
+                for (Command command : MCMarket.getApi().getCommands(commandType, 1, 2)) {
                     runCommand(command);
                 }
             }
         }
     }
 
-    private void runCommand(MCMarketApi.Command command) {
+    private void runCommand(Command command) {
         if (Sponge.isServerAvailable()) {
             Optional<Player> player = Sponge.getServer().getPlayer(command.getPlayer().getName());
             boolean shouldExecute = true;
@@ -79,7 +80,7 @@ public class PurchasesTask implements Runnable {
                             }).submit(plugin);
                         }
                     }).submit(plugin);
-                    plugin.getApi().setExecuted(command.getId());
+                    MCMarket.getApi().setExecuted(command.getId());
                 }
             }
         }
