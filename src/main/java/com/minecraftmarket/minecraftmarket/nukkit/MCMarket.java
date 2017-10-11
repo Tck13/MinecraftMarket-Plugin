@@ -9,6 +9,7 @@ import cn.nukkit.utils.TextFormat;
 import com.minecraftmarket.minecraftmarket.common.api.MCMarketApi;
 import com.minecraftmarket.minecraftmarket.common.i18n.I18n;
 import com.minecraftmarket.minecraftmarket.common.metrics.NukkitMetrics;
+import com.minecraftmarket.minecraftmarket.common.updater.UpdateChecker;
 import com.minecraftmarket.minecraftmarket.common.utils.FileUtils;
 import com.minecraftmarket.minecraftmarket.nukkit.commands.*;
 import com.minecraftmarket.minecraftmarket.nukkit.configs.MainConfig;
@@ -17,7 +18,6 @@ import com.minecraftmarket.minecraftmarket.nukkit.configs.SignsLayoutConfig;
 import com.minecraftmarket.minecraftmarket.nukkit.listeners.SignsListener;
 import com.minecraftmarket.minecraftmarket.nukkit.tasks.PurchasesTask;
 import com.minecraftmarket.minecraftmarket.nukkit.tasks.SignsTask;
-import com.minecraftmarket.minecraftmarket.nukkit.utils.updater.Updater;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -49,9 +49,14 @@ public final class MCMarket extends PluginBase {
         subCmds.add(new Version(this));
 
         new NukkitMetrics(this);
-        new Updater(this, 44031, pluginURL -> {
-            getLogger().warning(I18n.tl("new_version"));
-            getLogger().warning(pluginURL);
+        getServer().getScheduler().scheduleAsyncTask(this, new AsyncTask() {
+            @Override
+            public void onRun() {
+                new UpdateChecker(getDescription().getVersion(), 44031, pluginURL -> {
+                    getLogger().warning(I18n.tl("new_version"));
+                    getLogger().warning(pluginURL);
+                });
+            }
         });
     }
 
