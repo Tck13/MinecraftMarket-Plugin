@@ -8,5 +8,4 @@ cache:
     - '$HOME/.m2/repository'
 
 script:
-  - mvn dependency:purge-local-repository -DactTransitively=false -DreResolve=false
   - mvn clean install
