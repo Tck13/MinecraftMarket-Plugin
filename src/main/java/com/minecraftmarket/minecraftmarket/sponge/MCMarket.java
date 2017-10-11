@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.minecraftmarket.minecraftmarket.common.api.MCMarketApi;
 import com.minecraftmarket.minecraftmarket.common.i18n.I18n;
 import com.minecraftmarket.minecraftmarket.common.metrics.SpongeMetrics;
+import com.minecraftmarket.minecraftmarket.common.updater.UpdateChecker;
 import com.minecraftmarket.minecraftmarket.common.utils.FileUtils;
 import com.minecraftmarket.minecraftmarket.sponge.commands.MainCMD;
 import com.minecraftmarket.minecraftmarket.sponge.config.MainConfig;
@@ -12,7 +13,6 @@ import com.minecraftmarket.minecraftmarket.sponge.config.SignsLayoutConfig;
 import com.minecraftmarket.minecraftmarket.sponge.listeners.SignsListener;
 import com.minecraftmarket.minecraftmarket.sponge.tasks.PurchasesTask;
 import com.minecraftmarket.minecraftmarket.sponge.tasks.SignsTask;
-import com.minecraftmarket.minecraftmarket.sponge.utils.updater.Updater;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.args.GenericArguments;
@@ -36,7 +36,7 @@ import java.util.Optional;
 @Plugin(
         id = "minecraftmarket",
         name = "MinecraftMarket",
-        version = "3.5.0",
+        version = "3.5.1",
         description = "The #1 webstore platform for Minecraft servers",
         authors = "R4G3_BABY",
         url = "https://www.minecraftmarket.com"
@@ -82,10 +82,11 @@ public final class MCMarket {
                 .build();
         Sponge.getCommandManager().register(this, mainCMD, "minecraftmarket", "mm");
 
-        new Updater(Sponge.getPluginManager().fromInstance(this).orElse(null), 44031, pluginURL -> {
+        Optional<PluginContainer> optional = Sponge.getPluginManager().fromInstance(this);
+        optional.ifPresent(pluginContainer -> Sponge.getScheduler().createTaskBuilder().async().execute(() -> new UpdateChecker(optional.get().getVersion().orElse("NA"), 44031, pluginURL -> {
             logger.warn(I18n.tl("new_version"));
             logger.warn(pluginURL);
-        });
+        })).submit(pluginContainer));
     }
 
     @Listener

@@ -6,7 +6,7 @@
 
     <groupId>com.minecraftmarket</groupId>
     <artifactId>MinecraftMarket</artifactId>
-    <version>3.5.0</version>
+    <version>3.5.1</version>
     <packaging>jar</packaging>
 
     <name>MinecraftMarket</name>
@@ -79,7 +79,7 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.9.0</version>
+            <version>2.9.1</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>
@@ -111,7 +111,6 @@
                 <configuration>
                     <minimizeJar>true</minimizeJar>
                     <relocations>
-                        <!-- Relocate Jackson -->
                         <relocation>
                             <pattern>com.fasterxml.jackson</pattern>
                             <shadedPattern>com.minecraftmarket.minecraftmarket.shaded.jackson</shadedPattern>
