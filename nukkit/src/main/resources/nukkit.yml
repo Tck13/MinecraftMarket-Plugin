@@ -1,0 +1,21 @@
+name: ${project.parent.name}
+version: ${project.parent.version}
+api: [1.0.0]
+main: ${project.groupId}.minecraftmarket.${project.artifactId}.MCMarket
+description: ${project.parent.description}
+website: ${project.parent.url}
+
+commands:
+  MinecraftMarket:
+    permission: minecraftmarket.use
+    description: Manage plugin functionalities
+    aliases: [mm]
+    usage: /mm <args>
+
+permissions:
+  minecraftmarket.use:
+    description: Allows main command usage
+    default: op
+  minecraftmarket.signs:
+    description: Can break signs to remove them
+    default: op
