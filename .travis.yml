@@ -3,6 +3,9 @@ udo: false
 language: java
 jdk: oraclejdk8
 
+notifications:
+  webhooks: https://r4g3baby.com/travis-ci/discord-hook.php
+
 cache:
   directories:
     - '$HOME/.m2/repository'
