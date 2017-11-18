@@ -14,7 +14,7 @@ import com.minecraftmarket.minecraftmarket.bukkit.tasks.SignsTask;
 import com.minecraftmarket.minecraftmarket.bukkit.utils.inventories.InventoryGUI;
 import com.minecraftmarket.minecraftmarket.common.api.MCMarketApi;
 import com.minecraftmarket.minecraftmarket.common.i18n.I18n;
-import com.minecraftmarket.minecraftmarket.common.metrics.BukkitMetrics;
+import com.minecraftmarket.minecraftmarket.common.stats.BukkitStats;
 import com.minecraftmarket.minecraftmarket.common.updater.UpdateChecker;
 import com.minecraftmarket.minecraftmarket.common.utils.FileUtils;
 import org.bukkit.event.HandlerList;
@@ -44,7 +44,7 @@ public final class MCMarket extends JavaPlugin {
         getCommand("MinecraftMarket").setExecutor(new MMCmd(this));
         getCommand("MMGui").setExecutor(new MMGui(this));
 
-        new BukkitMetrics(this);
+        new BukkitStats(this);
         getServer().getScheduler().runTaskAsynchronously(this, () -> new UpdateChecker(getDescription().getVersion(), 44031, pluginURL -> {
             getLogger().warning(I18n.tl("new_version"));
             getLogger().warning(pluginURL);

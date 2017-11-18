@@ -3,7 +3,7 @@ version: ${project.parent.version}
 main: ${project.groupId}.minecraftmarket.${project.artifactId}.MCMarket
 softdepend: [Multiverse-Core, MultiWorld]
 authors: [R4G3_BABY]
-description: ${project.parent.description}
+description: "${project.parent.description}"
 website: ${project.parent.url}
 
 commands:
