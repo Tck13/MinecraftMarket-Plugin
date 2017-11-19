@@ -513,6 +513,11 @@ public class MCMarketApi {
             out.write(query);
             out.close();
         }
+        if (method.equals("POST")) {
+            System.out.println("Making a " + method + " request to " + url);
+            System.out.println("With body " + query);
+            System.out.println("Response " + conn.getResponseCode() + " " + conn.getResponseMessage());
+        }
         return new BufferedReader(new InputStreamReader(conn.getInputStream()));
     }
 
