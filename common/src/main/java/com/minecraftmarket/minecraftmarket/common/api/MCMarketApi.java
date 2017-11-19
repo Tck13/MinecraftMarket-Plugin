@@ -467,14 +467,28 @@ public class MCMarketApi {
         return null;
     }
 
-    public void setExecuted(long commandID) {
+    public boolean setExecuted(long commandID) {
         try {
             makeRequest(String.format("/commands/%s", commandID), "PUT", "{\"executed\":1}");
         } catch (IOException e) {
             if (DEBUG) {
                 e.printStackTrace();
             }
+            return false;
         }
+        return true;
+    }
+
+    public boolean sendEvents(String json) {
+        try {
+            makeRequest("/events/", "PUT", json);
+        } catch (IOException e) {
+            if (DEBUG) {
+                e.printStackTrace();
+            }
+            return false;
+        }
+        return true;
     }
 
     private BufferedReader makeRequest(String url, String method, String query) throws IOException {

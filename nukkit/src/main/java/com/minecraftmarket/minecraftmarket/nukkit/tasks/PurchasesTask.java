@@ -44,41 +44,39 @@ public class PurchasesTask extends AsyncTask {
 
     private void runCommand(Command command) {
         Player player = Server.getInstance().getPlayerExact(command.getPlayer().getName());
-        boolean shouldExecute = true;
         if (command.isRequiredOnline() && (player == null || !player.isOnline())) {
-            shouldExecute = false;
+            return;
         }
-        if (shouldExecute) {
-            if (command.getRequiredSlots() > 0 && player != null) {
-                if (getEmptySlots(player.getInventory()) < command.getRequiredSlots()) {
-                    shouldExecute = false;
-                }
+
+        if (command.getRequiredSlots() > 0 && player != null) {
+            if (getEmptySlots(player.getInventory()) < command.getRequiredSlots()) {
+                return;
             }
-            if (shouldExecute) {
-                plugin.getServer().getScheduler().scheduleDelayedTask(plugin, new AsyncTask() {
-                    @Override
-                    public void onRun() {
-                        plugin.getServer().getScheduler().scheduleTask(plugin, () -> plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), command.getCommand()));
-                        if (command.isRepeat()) {
-                            long period = command.getRepeatPeriod() > 0 ? 20 * 60 * 60 * command.getRepeatPeriod() : 1;
-                            new NukkitRunnable() {
-                                int executed = 0;
+        }
 
-                                @Override
-                                public void run() {
-                                    plugin.getServer().getScheduler().scheduleTask(plugin, () -> plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), command.getCommand()));
-                                    executed++;
+        if (MCMarket.getApi().setExecuted(command.getId())) {
+            plugin.getServer().getScheduler().scheduleDelayedTask(plugin, new AsyncTask() {
+                @Override
+                public void onRun() {
+                    plugin.getServer().getScheduler().scheduleTask(plugin, () -> plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), command.getCommand()));
+                    if (command.isRepeat()) {
+                        long period = command.getRepeatPeriod() > 0 ? 20 * 60 * 60 * command.getRepeatPeriod() : 1;
+                        new NukkitRunnable() {
+                            int executed = 0;
 
-                                    if (executed >= command.getRepeatCycles()) {
-                                        cancel();
-                                    }
+                            @Override
+                            public void run() {
+                                plugin.getServer().getScheduler().scheduleTask(plugin, () -> plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), command.getCommand()));
+                                executed++;
+
+                                if (executed >= command.getRepeatCycles()) {
+                                    cancel();
                                 }
-                            }.runTaskTimerAsynchronously(plugin, (int) period, (int) period);
-                        }
+                            }
+                        }.runTaskTimerAsynchronously(plugin, (int) period, (int) period);
                     }
-                }, command.getDelay() > 0 ? (int) (20 * command.getDelay()) : 1, true);
-                MCMarket.getApi().setExecuted(command.getId());
-            }
+                }
+            }, command.getDelay() > 0 ? (int) (20 * command.getDelay()) : 1, true);
         }
     }
 

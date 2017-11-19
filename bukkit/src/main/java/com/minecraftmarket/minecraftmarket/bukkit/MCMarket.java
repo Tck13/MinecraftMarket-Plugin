@@ -44,7 +44,6 @@ public final class MCMarket extends JavaPlugin {
         getCommand("MinecraftMarket").setExecutor(new MMCmd(this));
         getCommand("MMGui").setExecutor(new MMGui(this));
 
-        new BukkitStats(this);
         getServer().getScheduler().runTaskAsynchronously(this, () -> new UpdateChecker(getDescription().getVersion(), 44031, pluginURL -> {
             getLogger().warning(I18n.tl("new_version"));
             getLogger().warning(pluginURL);
@@ -90,6 +89,10 @@ public final class MCMarket extends JavaPlugin {
                 purchasesTask = new PurchasesTask(MCMarket.this);
             }
             getServer().getScheduler().runTaskTimerAsynchronously(MCMarket.this, purchasesTask, 20 * 10, mainConfig.getCheckInterval() > 0 ? 20 * 60 * mainConfig.getCheckInterval() : 20 * 60);
+
+            if (result) {
+                new BukkitStats(marketApi, this);
+            }
 
             if (response != null) {
                 response.done(result);

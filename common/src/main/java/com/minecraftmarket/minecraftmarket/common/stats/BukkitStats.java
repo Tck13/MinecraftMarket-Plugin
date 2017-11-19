@@ -1,7 +1,6 @@
 package com.minecraftmarket.minecraftmarket.common.stats;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.minecraftmarket.minecraftmarket.common.api.MCMarketApi;
 import com.minecraftmarket.minecraftmarket.common.stats.models.StatsEvent;
 import com.minecraftmarket.minecraftmarket.common.stats.models.StatsResponse;
 import com.minecraftmarket.minecraftmarket.common.utils.Ping;
@@ -13,13 +12,17 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-public class BukkitStats {
+public class BukkitStats extends MMStats {
     private final JavaPlugin plugin;
     private List<StatsEvent> events = new ArrayList<>();
 
-    public BukkitStats(JavaPlugin plugin) {
+    public BukkitStats(MCMarketApi marketApi, JavaPlugin plugin) {
+        super(marketApi);
         this.plugin = plugin;
 
         plugin.getServer().getScheduler().runTaskTimerAsynchronously(plugin, new DataTask(), 20 * 10, 20 * 60);
@@ -96,10 +99,6 @@ public class BukkitStats {
         return data;
     }
 
-    private long getTime() {
-        return Calendar.getInstance().getTimeInMillis();
-    }
-
     private class DataTask implements Runnable {
         private int cycles = 0;
 
@@ -107,13 +106,9 @@ public class BukkitStats {
         public void run() {
             events.add(new StatsEvent("server_info", getTime(), getServerData()));
             if (cycles >= 4) {
-                try {
-                    String result = new ObjectMapper().writeValueAsString(new StatsResponse("myrandomkeyhere", events));
-                    System.out.println(result);
-                } catch (JsonProcessingException e) {
-                    e.printStackTrace();
+                if (sendData(new StatsResponse(events))) {
+                    events.clear();
                 }
-                events.clear();
                 cycles = 0;
             } else {
                 cycles++;
