@@ -481,7 +481,7 @@ public class MCMarketApi {
 
     public boolean sendEvents(String json) {
         try {
-            makeRequest("/events/", "PUT", json);
+            makeRequest("/events/", "POST", json);
         } catch (IOException e) {
             if (DEBUG) {
                 e.printStackTrace();
@@ -493,7 +493,10 @@ public class MCMarketApi {
 
     private BufferedReader makeRequest(String url, String method, String query) throws IOException {
         HttpURLConnection conn;
-        if (method.equals("PUT")) {
+        if (method.equals("POST")) {
+            conn = (HttpURLConnection) new URL(BASE_URL + API_KEY + url + "/?format=json").openConnection();
+            conn.setRequestMethod("POST");
+        } else if (method.equals("PUT")) {
             conn = (HttpURLConnection) new URL(BASE_URL + API_KEY + url + "/?format=json").openConnection();
             conn.setRequestMethod("PUT");
         } else {
@@ -502,12 +505,12 @@ public class MCMarketApi {
         }
         conn.setRequestProperty("Content-Type", "application/json");
         conn.setRequestProperty("Accept", "application/json");
-        if (USER_AGENT != null) conn.setRequestProperty("User-Agent", USER_AGENT);
+        conn.setRequestProperty("User-Agent", USER_AGENT);
         conn.setUseCaches(false);
         conn.setConnectTimeout(3000);
         conn.setReadTimeout(10000);
         conn.setDoInput(true);
-        if (conn.getRequestMethod().equals("PUT")) {
+        if (method.equals("POST") || method.equals("PUT")) {
             conn.setDoOutput(true);
             OutputStreamWriter out = new OutputStreamWriter(conn.getOutputStream());
             out.write(query);
