@@ -52,9 +52,9 @@ public final class MCMarket extends Plugin {
 
         setKey(mainConfig.getApiKey(), false, result -> {
             if (purchasesTask == null) {
-                purchasesTask = new PurchasesTask(MCMarket.this);
+                purchasesTask = new PurchasesTask(this);
             }
-            getProxy().getScheduler().schedule(MCMarket.this, purchasesTask, 10, mainConfig.getCheckInterval() > 0 ? 60 * mainConfig.getCheckInterval() : 60, TimeUnit.SECONDS);
+            getProxy().getScheduler().schedule(this, purchasesTask, 10, mainConfig.getCheckInterval() > 0 ? 60 * mainConfig.getCheckInterval() : 60, TimeUnit.SECONDS);
 
             if (result) {
                 new BungeeStats(marketApi, this);
