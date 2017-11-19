@@ -493,12 +493,9 @@ public class MCMarketApi {
 
     private BufferedReader makeRequest(String url, String method, String query) throws IOException {
         HttpURLConnection conn;
-        if (method.equals("POST")) {
+        if (method.equals("POST") || method.equals("PUT")) {
             conn = (HttpURLConnection) new URL(BASE_URL + API_KEY + url + "/?format=json").openConnection();
-            conn.setRequestMethod("POST");
-        } else if (method.equals("PUT")) {
-            conn = (HttpURLConnection) new URL(BASE_URL + API_KEY + url + "/?format=json").openConnection();
-            conn.setRequestMethod("PUT");
+            conn.setRequestMethod(method);
         } else {
             conn = (HttpURLConnection) new URL(BASE_URL + API_KEY + url + "/?format=json" + query).openConnection();
             conn.setRequestMethod("GET");
