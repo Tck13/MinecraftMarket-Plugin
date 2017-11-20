@@ -36,7 +36,23 @@ public class BungeeStats extends MCMarketStats {
             }
         });
 
-        plugin.getProxy().getScheduler().schedule(plugin, () -> plugin.getProxy().getScheduler().runAsync(plugin, () -> new DataTask().run()), 10, 60, TimeUnit.SECONDS);
+        DataTask task = new DataTask();
+        plugin.getProxy().getScheduler().schedule(plugin, new Runnable() {
+            private int cycles = 1;
+
+            @Override
+            public void run() {
+                plugin.getProxy().getScheduler().runAsync(plugin, () -> {
+                    task.overrideCycles(cycles);
+                    task.run();
+                    if (cycles >= 5) {
+                        cycles = 1;
+                    } else {
+                        cycles++;
+                    }
+                });
+            }
+        }, 10, 60, TimeUnit.SECONDS);
     }
 
     @Override
