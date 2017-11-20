@@ -56,7 +56,7 @@ public final class MCMarket extends Plugin {
             }
             getProxy().getScheduler().schedule(this, purchasesTask, 10, mainConfig.getCheckInterval() > 0 ? 60 * mainConfig.getCheckInterval() : 60, TimeUnit.SECONDS);
 
-            if (result) {
+            if (result && mainConfig.isStatistics()) {
                 new BungeeStats(marketApi, this);
             }
 

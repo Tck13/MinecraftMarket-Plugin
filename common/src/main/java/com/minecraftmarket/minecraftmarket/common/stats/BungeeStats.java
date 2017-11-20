@@ -9,10 +9,7 @@ import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.event.EventHandler;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public class BungeeStats extends MCMarketStats {
@@ -36,23 +33,7 @@ public class BungeeStats extends MCMarketStats {
             }
         });
 
-        DataTask task = new DataTask();
-        plugin.getProxy().getScheduler().schedule(plugin, new Runnable() {
-            private int cycles = 1;
-
-            @Override
-            public void run() {
-                plugin.getProxy().getScheduler().runAsync(plugin, () -> {
-                    task.overrideCycles(cycles);
-                    task.run();
-                    if (cycles >= 5) {
-                        cycles = 1;
-                    } else {
-                        cycles++;
-                    }
-                });
-            }
-        }, 10, 60, TimeUnit.SECONDS);
+        plugin.getProxy().getScheduler().schedule(plugin, this::runEventsSender, 10, 60, TimeUnit.SECONDS);
     }
 
     @Override

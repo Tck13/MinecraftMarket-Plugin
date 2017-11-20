@@ -121,7 +121,7 @@ public final class MCMarket {
             }
             Sponge.getScheduler().createTaskBuilder().async().delayTicks(20 * 10).intervalTicks(mainConfig.getCheckInterval() > 0 ? 20 * 60 * mainConfig.getCheckInterval() : 20 * 60).execute(purchasesTask).submit(this);
 
-            if (result) {
+            if (result && mainConfig.isStatistics()) {
                 Optional<PluginContainer> optional = Sponge.getPluginManager().fromInstance(this);
                 optional.ifPresent(pluginContainer -> new SpongeStats(marketApi, pluginContainer));
             }

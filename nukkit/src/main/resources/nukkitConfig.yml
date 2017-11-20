@@ -6,6 +6,8 @@ CheckInterval: 1
 UseSigns: true
 # Date format to use on recent donors signs
 DateFormat: yyyy-MM-dd
+# Enable plugin Statistics system
+Statistics: true
 # Language to use on messages language files located at langs folder
 Lang: en
 # Log errors no need to activate this

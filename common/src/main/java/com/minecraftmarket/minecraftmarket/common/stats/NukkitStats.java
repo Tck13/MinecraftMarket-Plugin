@@ -9,10 +9,7 @@ import cn.nukkit.plugin.Plugin;
 import com.minecraftmarket.minecraftmarket.common.api.MCMarketApi;
 import com.minecraftmarket.minecraftmarket.common.stats.models.StatsEvent;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class NukkitStats extends MCMarketStats {
     private final Plugin plugin;
@@ -33,7 +30,19 @@ public class NukkitStats extends MCMarketStats {
             }
         }, plugin);
 
-        plugin.getServer().getScheduler().scheduleDelayedRepeatingTask(plugin, new DataTask(), 20 * 10, 20 * 60, true);
+        Timer timer = new Timer(true);
+        timer.scheduleAtFixedRate(new TimerTask() {
+
+            @Override
+            public void run() {
+                if (!plugin.isEnabled()) {
+                    timer.cancel();
+                    return;
+                }
+
+                runEventsSender();
+            }
+        }, 1000 * 10, 1000 * 60);
     }
 
     @Override

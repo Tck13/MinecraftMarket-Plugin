@@ -13,6 +13,7 @@ public class MainConfig extends ConfigFile {
     private final boolean useSigns;
     private final String dateFormat;
     private final String defaultHeadSkin;
+    private final boolean statistics;
     private final String lang;
     private final boolean debug;
 
@@ -26,6 +27,7 @@ public class MainConfig extends ConfigFile {
         useSigns = config.getBoolean("UseSigns");
         dateFormat = config.getString("DateFormat");
         defaultHeadSkin = config.getString("DefaultHeadSkin");
+        statistics = config.getBoolean("Statistics");
         lang = config.getString("Lang");
         debug = config.getBoolean("Debug");
     }
@@ -61,6 +63,10 @@ public class MainConfig extends ConfigFile {
 
     public String getDefaultHeadSkin() {
         return defaultHeadSkin;
+    }
+
+    public boolean isStatistics() {
+        return statistics;
     }
 
     public String getLang() {

@@ -6,6 +6,7 @@ import net.md_5.bungee.api.plugin.Plugin;
 public class MainConfig extends ConfigFile {
     private final String apiKey;
     private final int checkInterval;
+    private final boolean statistics;
     private final String lang;
     private final boolean debug;
 
@@ -14,6 +15,7 @@ public class MainConfig extends ConfigFile {
 
         apiKey = config.getString("APIKey");
         checkInterval = config.getInt("CheckInterval");
+        statistics = config.getBoolean("Statistics");
         lang = config.getString("Lang");
         debug = config.getBoolean("Debug");
     }
@@ -29,6 +31,10 @@ public class MainConfig extends ConfigFile {
 
     public int getCheckInterval() {
         return checkInterval;
+    }
+
+    public boolean isStatistics() {
+        return statistics;
     }
 
     public String getLang() {
