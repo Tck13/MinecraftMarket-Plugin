@@ -40,7 +40,7 @@ public class NukkitStats extends MCMarketStats {
                     return;
                 }
 
-                runEventsSender();
+                plugin.getServer().getScheduler().scheduleTask(plugin, () -> runEventsSender());
             }
         }, 1000 * 10, 1000 * 60);
     }

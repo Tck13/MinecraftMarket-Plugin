@@ -28,7 +28,7 @@ public class SpongeStats extends MCMarketStats {
                     return;
                 }
 
-                runEventsSender();
+                Sponge.getScheduler().createTaskBuilder().execute(() -> runEventsSender()).submit(plugin);
             }
         }, 1000 * 10, 1000 * 60);
     }

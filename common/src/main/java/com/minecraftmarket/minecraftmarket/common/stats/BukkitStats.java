@@ -42,9 +42,9 @@ public class BukkitStats extends MCMarketStats {
                     return;
                 }
 
-                runEventsSender();
+                plugin.getServer().getScheduler().runTask(plugin, () -> runEventsSender());
             }
-        }, 1000 * 10, 1000 * 30);
+        }, 1000 * 10, 1000 * 60);
     }
 
     @Override
