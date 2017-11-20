@@ -507,7 +507,7 @@ public class MCMarketApi {
         conn.setUseCaches(false);
         conn.setConnectTimeout(3000);
         conn.setReadTimeout(10000);
-        conn.setDoInput(getInput);
+        conn.setDoInput(true);
 
         if (method.equals("POST") || method.equals("PUT")) {
             conn.setDoOutput(true);
@@ -519,6 +519,7 @@ public class MCMarketApi {
         if (getInput) {
             return new BufferedReader(new InputStreamReader(conn.getInputStream()));
         } else {
+            conn.getInputStream().close();
             return null;
         }
     }
