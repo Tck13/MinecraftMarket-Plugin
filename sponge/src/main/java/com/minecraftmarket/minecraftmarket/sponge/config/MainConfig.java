@@ -9,6 +9,7 @@ public class MainConfig extends ConfigFile {
     private final int checkInterval;
     private final boolean useSigns;
     private final String dateFormat;
+    private final boolean statistics;
     private final String lang;
     private final boolean debug;
 
@@ -19,6 +20,7 @@ public class MainConfig extends ConfigFile {
         checkInterval = config.getNode("CheckInterval").getInt();
         useSigns = config.getNode("UseSigns").getBoolean();
         dateFormat = config.getNode("DateFormat").getString();
+        statistics = config.getNode("Statistics").getBoolean();
         lang = config.getNode("Lang").getString();
         debug = config.getNode("Debug").getBoolean();
     }
@@ -42,6 +44,10 @@ public class MainConfig extends ConfigFile {
 
     public String getDateFormat() {
         return dateFormat;
+    }
+
+    public boolean isStatistics() {
+        return statistics;
     }
 
     public String getLang() {

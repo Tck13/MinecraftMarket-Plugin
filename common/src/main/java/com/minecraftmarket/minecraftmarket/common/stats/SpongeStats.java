@@ -10,7 +10,6 @@ import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.plugin.PluginContainer;
 
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 public class SpongeStats extends MCMarketStats {
 
@@ -19,7 +18,19 @@ public class SpongeStats extends MCMarketStats {
 
         Sponge.getEventManager().registerListeners(plugin, this);
 
-        Sponge.getScheduler().createTaskBuilder().async().delay(10, TimeUnit.SECONDS).interval(60, TimeUnit.SECONDS).execute(new DataTask()).submit(plugin);
+        Timer timer = new Timer(true);
+        timer.scheduleAtFixedRate(new TimerTask() {
+
+            @Override
+            public void run() {
+                if (!Sponge.getPluginManager().isLoaded(plugin.getId())) {
+                    timer.cancel();
+                    return;
+                }
+
+                Sponge.getScheduler().createTaskBuilder().execute(() -> runEventsSender()).submit(plugin);
+            }
+        }, 1000 * 10, 1000 * 60);
     }
 
     @Listener

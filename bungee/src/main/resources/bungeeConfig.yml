@@ -2,6 +2,8 @@
 APIKey: randomstring
 # Time between purchases checks in minutes
 CheckInterval: 1
+# Enable plugin Statistics system
+Statistics: true
 # Language to use on messages language files located at langs folder
 Lang: en
 # Log errors no need to activate this

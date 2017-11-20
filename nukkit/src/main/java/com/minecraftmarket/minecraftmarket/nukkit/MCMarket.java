@@ -113,7 +113,7 @@ public final class MCMarket extends PluginBase {
             }
             getServer().getScheduler().scheduleRepeatingTask(this, purchasesTask, mainConfig.getCheckInterval() > 0 ? 20 * 60 * mainConfig.getCheckInterval() : 20 * 60, true);
 
-            if (result) {
+            if (result && mainConfig.isStatistics()) {
                 new NukkitStats(marketApi, this);
             }
 

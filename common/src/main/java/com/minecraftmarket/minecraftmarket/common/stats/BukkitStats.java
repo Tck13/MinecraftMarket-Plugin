@@ -11,10 +11,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class BukkitStats extends MCMarketStats {
     private final JavaPlugin plugin;
@@ -35,7 +32,19 @@ public class BukkitStats extends MCMarketStats {
             }
         }, plugin);
 
-        plugin.getServer().getScheduler().runTaskTimerAsynchronously(plugin, new DataTask(), 20 * 10, 20 * 60);
+        Timer timer = new Timer(true);
+        timer.scheduleAtFixedRate(new TimerTask() {
+
+            @Override
+            public void run() {
+                if (!plugin.isEnabled()) {
+                    timer.cancel();
+                    return;
+                }
+
+                plugin.getServer().getScheduler().runTask(plugin, () -> runEventsSender());
+            }
+        }, 1000 * 10, 1000 * 60);
     }
 
     @Override

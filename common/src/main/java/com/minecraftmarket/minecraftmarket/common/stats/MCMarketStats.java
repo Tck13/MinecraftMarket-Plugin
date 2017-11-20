@@ -34,24 +34,18 @@ abstract class MCMarketStats {
     }
 
     final List<StatsEvent> events = new ArrayList<>();
-    class DataTask implements Runnable {
-        private int cycles = 1;
-
-        @Override
-        public void run() {
-            events.add(new StatsEvent("server_info", getServerData()));
-            if (cycles >= 5) {
+    private int cycles = 1;
+    void runEventsSender() {
+        events.add(new StatsEvent("server_info", getServerData()));
+        if (cycles >= 5) {
+            new Thread(() -> {
                 if (sendData()) {
                     events.clear();
                 }
-                cycles = 1;
-            } else {
-                cycles++;
-            }
-        }
-
-        void overrideCycles(int cycles) {
-            this.cycles = cycles;
+            }).start();
+            cycles = 1;
+        } else {
+            cycles++;
         }
     }
 

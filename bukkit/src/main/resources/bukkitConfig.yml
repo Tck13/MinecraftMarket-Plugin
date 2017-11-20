@@ -14,6 +14,8 @@ UseSigns: true
 DateFormat: yyyy-MM-dd
 # Default skin to use on heads when account is cracked or request fails
 DefaultHeadSkin: https://textures.minecraft.net/texture/5163dafac1d91a8c91db576caac784336791a6e18d8f7f62778fc47bf146b6
+# Enable plugin Statistics system
+Statistics: true
 # Language to use on messages language files located at langs folder
 Lang: en
 # Log errors no need to activate this

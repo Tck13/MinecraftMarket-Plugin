@@ -90,7 +90,7 @@ public final class MCMarket extends JavaPlugin {
             }
             getServer().getScheduler().runTaskTimerAsynchronously(this, purchasesTask, 20 * 10, mainConfig.getCheckInterval() > 0 ? 20 * 60 * mainConfig.getCheckInterval() : 20 * 60);
 
-            if (result) {
+            if (result && mainConfig.isStatistics()) {
                 new BukkitStats(marketApi, this);
             }
 
