@@ -14,7 +14,7 @@ import com.minecraftmarket.minecraftmarket.bukkit.tasks.SignsTask;
 import com.minecraftmarket.minecraftmarket.bukkit.utils.inventories.InventoryGUI;
 import com.minecraftmarket.minecraftmarket.common.api.MCMarketApi;
 import com.minecraftmarket.minecraftmarket.common.i18n.I18n;
-import com.minecraftmarket.minecraftmarket.common.metrics.BukkitMetrics;
+import com.minecraftmarket.minecraftmarket.common.stats.BukkitStats;
 import com.minecraftmarket.minecraftmarket.common.updater.UpdateChecker;
 import com.minecraftmarket.minecraftmarket.common.utils.FileUtils;
 import org.bukkit.event.HandlerList;
@@ -44,7 +44,6 @@ public final class MCMarket extends JavaPlugin {
         getCommand("MinecraftMarket").setExecutor(new MMCmd(this));
         getCommand("MMGui").setExecutor(new MMGui(this));
 
-        new BukkitMetrics(this);
         getServer().getScheduler().runTaskAsynchronously(this, () -> new UpdateChecker(getDescription().getVersion(), 44031, pluginURL -> {
             getLogger().warning(I18n.tl("new_version"));
             getLogger().warning(pluginURL);
@@ -72,24 +71,28 @@ public final class MCMarket extends JavaPlugin {
         setKey(mainConfig.getApiKey(), false, result -> {
             if (mainConfig.isUseGUI()) {
                 if (inventoryManager == null) {
-                    inventoryManager = new InventoryManager(MCMarket.this);
+                    inventoryManager = new InventoryManager(this);
                 }
-                getServer().getPluginManager().registerEvents(new ShopCmdListener(MCMarket.this), MCMarket.this);
-                getServer().getPluginManager().registerEvents(InventoryGUI.getListener(), MCMarket.this);
+                getServer().getPluginManager().registerEvents(new ShopCmdListener(this), this);
+                getServer().getPluginManager().registerEvents(InventoryGUI.getListener(), this);
             }
 
             if (mainConfig.isUseSigns()) {
                 if (signsTask == null) {
-                    signsTask = new SignsTask(MCMarket.this);
+                    signsTask = new SignsTask(this);
                 }
-                getServer().getScheduler().runTaskTimer(MCMarket.this, signsTask, 20 * 10, mainConfig.getCheckInterval() > 0 ? 20 * 60 * mainConfig.getCheckInterval() : 20 * 60);
-                getServer().getPluginManager().registerEvents(new SignsListener(MCMarket.this), MCMarket.this);
+                getServer().getScheduler().runTaskTimer(this, signsTask, 20 * 10, mainConfig.getCheckInterval() > 0 ? 20 * 60 * mainConfig.getCheckInterval() : 20 * 60);
+                getServer().getPluginManager().registerEvents(new SignsListener(this), this);
             }
 
             if (purchasesTask == null) {
-                purchasesTask = new PurchasesTask(MCMarket.this);
+                purchasesTask = new PurchasesTask(this);
             }
-            getServer().getScheduler().runTaskTimerAsynchronously(MCMarket.this, purchasesTask, 20 * 10, mainConfig.getCheckInterval() > 0 ? 20 * 60 * mainConfig.getCheckInterval() : 20 * 60);
+            getServer().getScheduler().runTaskTimerAsynchronously(this, purchasesTask, 20 * 10, mainConfig.getCheckInterval() > 0 ? 20 * 60 * mainConfig.getCheckInterval() : 20 * 60);
+
+            if (result) {
+                new BukkitStats(marketApi, this);
+            }
 
             if (response != null) {
                 response.done(result);

@@ -7,7 +7,7 @@
     <parent>
         <artifactId>MinecraftMarket</artifactId>
         <groupId>com.minecraftmarket</groupId>
-        <version>3.5.2</version>
+        <version>3.6.0</version>
     </parent>
 
     <artifactId>sponge</artifactId>

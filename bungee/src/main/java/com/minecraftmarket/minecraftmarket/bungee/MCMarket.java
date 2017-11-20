@@ -5,7 +5,7 @@ import com.minecraftmarket.minecraftmarket.bungee.configs.MainConfig;
 import com.minecraftmarket.minecraftmarket.bungee.tasks.PurchasesTask;
 import com.minecraftmarket.minecraftmarket.common.api.MCMarketApi;
 import com.minecraftmarket.minecraftmarket.common.i18n.I18n;
-import com.minecraftmarket.minecraftmarket.common.metrics.BungeeMetrics;
+import com.minecraftmarket.minecraftmarket.common.stats.BungeeStats;
 import com.minecraftmarket.minecraftmarket.common.updater.UpdateChecker;
 import com.minecraftmarket.minecraftmarket.common.utils.FileUtils;
 import net.md_5.bungee.api.plugin.Plugin;
@@ -31,7 +31,6 @@ public final class MCMarket extends Plugin {
 
         getProxy().getPluginManager().registerCommand(this, new MMCmd(this));
 
-        new BungeeMetrics(this);
         getProxy().getScheduler().runAsync(this, () -> new UpdateChecker(getDescription().getVersion(), 44031, pluginURL -> {
             getLogger().warning(I18n.tl("new_version"));
             getLogger().warning(pluginURL);
@@ -53,9 +52,13 @@ public final class MCMarket extends Plugin {
 
         setKey(mainConfig.getApiKey(), false, result -> {
             if (purchasesTask == null) {
-                purchasesTask = new PurchasesTask(MCMarket.this);
+                purchasesTask = new PurchasesTask(this);
             }
-            getProxy().getScheduler().schedule(MCMarket.this, purchasesTask, 10, mainConfig.getCheckInterval() > 0 ? 60 * mainConfig.getCheckInterval() : 60, TimeUnit.SECONDS);
+            getProxy().getScheduler().schedule(this, purchasesTask, 10, mainConfig.getCheckInterval() > 0 ? 60 * mainConfig.getCheckInterval() : 60, TimeUnit.SECONDS);
+
+            if (result) {
+                new BungeeStats(marketApi, this);
+            }
 
             if (response != null) {
                 response.done(result);

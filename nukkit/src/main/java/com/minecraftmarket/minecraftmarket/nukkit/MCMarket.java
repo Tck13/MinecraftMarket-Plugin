@@ -8,7 +8,7 @@ import cn.nukkit.scheduler.AsyncTask;
 import cn.nukkit.utils.TextFormat;
 import com.minecraftmarket.minecraftmarket.common.api.MCMarketApi;
 import com.minecraftmarket.minecraftmarket.common.i18n.I18n;
-import com.minecraftmarket.minecraftmarket.common.metrics.NukkitMetrics;
+import com.minecraftmarket.minecraftmarket.common.stats.NukkitStats;
 import com.minecraftmarket.minecraftmarket.common.updater.UpdateChecker;
 import com.minecraftmarket.minecraftmarket.common.utils.FileUtils;
 import com.minecraftmarket.minecraftmarket.nukkit.commands.*;
@@ -48,7 +48,6 @@ public final class MCMarket extends PluginBase {
         subCmds.add(new Reload(this));
         subCmds.add(new Version(this));
 
-        new NukkitMetrics(this);
         getServer().getScheduler().scheduleAsyncTask(this, new AsyncTask() {
             @Override
             public void onRun() {
@@ -103,16 +102,20 @@ public final class MCMarket extends PluginBase {
         setKey(mainConfig.getApiKey(), false, result -> {
             if (mainConfig.isUseSigns()) {
                 if (signsTask == null) {
-                    signsTask = new SignsTask(MCMarket.this);
+                    signsTask = new SignsTask(this);
                 }
-                getServer().getScheduler().scheduleDelayedRepeatingTask(MCMarket.this, signsTask, 20 * 10, mainConfig.getCheckInterval() > 0 ? 20 * 60 * mainConfig.getCheckInterval() : 20 * 60);
-                getServer().getPluginManager().registerEvents(new SignsListener(MCMarket.this), MCMarket.this);
+                getServer().getScheduler().scheduleDelayedRepeatingTask(this, signsTask, 20 * 10, mainConfig.getCheckInterval() > 0 ? 20 * 60 * mainConfig.getCheckInterval() : 20 * 60);
+                getServer().getPluginManager().registerEvents(new SignsListener(this), this);
             }
 
             if (purchasesTask == null) {
-                purchasesTask = new PurchasesTask(MCMarket.this);
+                purchasesTask = new PurchasesTask(this);
             }
-            getServer().getScheduler().scheduleRepeatingTask(MCMarket.this, purchasesTask, mainConfig.getCheckInterval() > 0 ? 20 * 60 * mainConfig.getCheckInterval() : 20 * 60, true);
+            getServer().getScheduler().scheduleRepeatingTask(this, purchasesTask, mainConfig.getCheckInterval() > 0 ? 20 * 60 * mainConfig.getCheckInterval() : 20 * 60, true);
+
+            if (result) {
+                new NukkitStats(marketApi, this);
+            }
 
             if (response != null) {
                 response.done(result);

@@ -3,7 +3,7 @@ package com.minecraftmarket.minecraftmarket.sponge;
 import com.google.inject.Inject;
 import com.minecraftmarket.minecraftmarket.common.api.MCMarketApi;
 import com.minecraftmarket.minecraftmarket.common.i18n.I18n;
-import com.minecraftmarket.minecraftmarket.common.metrics.SpongeMetrics;
+import com.minecraftmarket.minecraftmarket.common.stats.SpongeStats;
 import com.minecraftmarket.minecraftmarket.common.updater.UpdateChecker;
 import com.minecraftmarket.minecraftmarket.common.utils.FileUtils;
 import com.minecraftmarket.minecraftmarket.sponge.commands.MainCMD;
@@ -36,7 +36,7 @@ import java.util.Optional;
 @Plugin(
         id = "minecraftmarket",
         name = "MinecraftMarket",
-        version = "3.5.2",
+        version = "3.6.0",
         description = "The #1 webstore platform for Minecraft servers",
         authors = "R4G3_BABY",
         url = "https://www.minecraftmarket.com"
@@ -48,9 +48,6 @@ public final class MCMarket {
     @Inject
     @ConfigDir(sharedRoot = false)
     private Path baseDirectory;
-
-    @Inject
-    private SpongeMetrics metrics;
 
     private I18n i18n;
     private MainConfig mainConfig;
@@ -113,16 +110,21 @@ public final class MCMarket {
         setKey(mainConfig.getApiKey(), false, result -> {
             if (mainConfig.isUseSigns()) {
                 if (signsTask == null) {
-                    signsTask = new SignsTask(MCMarket.this);
+                    signsTask = new SignsTask(this);
                 }
-                Sponge.getScheduler().createTaskBuilder().delayTicks(20 * 10).intervalTicks(mainConfig.getCheckInterval() > 0 ? 20 * 60 * mainConfig.getCheckInterval() : 20 * 60).execute(signsTask).submit(MCMarket.this);
-                Sponge.getEventManager().registerListeners(MCMarket.this, new SignsListener(MCMarket.this));
+                Sponge.getScheduler().createTaskBuilder().delayTicks(20 * 10).intervalTicks(mainConfig.getCheckInterval() > 0 ? 20 * 60 * mainConfig.getCheckInterval() : 20 * 60).execute(signsTask).submit(this);
+                Sponge.getEventManager().registerListeners(this, new SignsListener(this));
             }
 
             if (purchasesTask == null) {
-                purchasesTask = new PurchasesTask(MCMarket.this);
+                purchasesTask = new PurchasesTask(this);
             }
-            Sponge.getScheduler().createTaskBuilder().async().delayTicks(20 * 10).intervalTicks(mainConfig.getCheckInterval() > 0 ? 20 * 60 * mainConfig.getCheckInterval() : 20 * 60).execute(purchasesTask).submit(MCMarket.this);
+            Sponge.getScheduler().createTaskBuilder().async().delayTicks(20 * 10).intervalTicks(mainConfig.getCheckInterval() > 0 ? 20 * 60 * mainConfig.getCheckInterval() : 20 * 60).execute(purchasesTask).submit(this);
+
+            if (result) {
+                Optional<PluginContainer> optional = Sponge.getPluginManager().fromInstance(this);
+                optional.ifPresent(pluginContainer -> new SpongeStats(marketApi, pluginContainer));
+            }
 
             if (response != null) {
                 response.done(result);

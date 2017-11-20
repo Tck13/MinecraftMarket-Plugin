@@ -467,33 +467,47 @@ public class MCMarketApi {
         return null;
     }
 
-    public void setExecuted(long commandID) {
+    public boolean setExecuted(long commandID) {
         try {
             makeRequest(String.format("/commands/%s", commandID), "PUT", "{\"executed\":1}");
         } catch (IOException e) {
             if (DEBUG) {
                 e.printStackTrace();
             }
+            return false;
         }
+        return true;
+    }
+
+    public boolean sendEvents(String json) {
+        try {
+            makeRequest("/events/", "POST", json);
+        } catch (IOException e) {
+            if (DEBUG) {
+                e.printStackTrace();
+            }
+            return false;
+        }
+        return true;
     }
 
     private BufferedReader makeRequest(String url, String method, String query) throws IOException {
         HttpURLConnection conn;
-        if (method.equals("PUT")) {
-            conn = (HttpURLConnection) new URL(BASE_URL + API_KEY + url + "/?format=json").openConnection();
-            conn.setRequestMethod("PUT");
+        if (method.equals("POST") || method.equals("PUT")) {
+            conn = (HttpURLConnection) new URL(BASE_URL + API_KEY + url + "?format=json").openConnection();
+            conn.setRequestMethod(method);
         } else {
-            conn = (HttpURLConnection) new URL(BASE_URL + API_KEY + url + "/?format=json" + query).openConnection();
+            conn = (HttpURLConnection) new URL(BASE_URL + API_KEY + url + "?format=json" + query).openConnection();
             conn.setRequestMethod("GET");
         }
         conn.setRequestProperty("Content-Type", "application/json");
         conn.setRequestProperty("Accept", "application/json");
-        if (USER_AGENT != null) conn.setRequestProperty("User-Agent", USER_AGENT);
+        conn.setRequestProperty("User-Agent", USER_AGENT);
         conn.setUseCaches(false);
         conn.setConnectTimeout(3000);
         conn.setReadTimeout(10000);
         conn.setDoInput(true);
-        if (conn.getRequestMethod().equals("PUT")) {
+        if (method.equals("POST") || method.equals("PUT")) {
             conn.setDoOutput(true);
             OutputStreamWriter out = new OutputStreamWriter(conn.getOutputStream());
             out.write(query);

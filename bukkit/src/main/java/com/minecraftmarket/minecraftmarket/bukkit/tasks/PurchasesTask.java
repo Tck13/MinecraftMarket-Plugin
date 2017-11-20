@@ -44,37 +44,36 @@ public class PurchasesTask implements Runnable {
 
     private void runCommand(Command command) {
         Player player = Bukkit.getPlayerExact(command.getPlayer().getName());
-        boolean shouldExecute = true;
         if (command.isRequiredOnline() && (player == null || !player.isOnline())) {
-            shouldExecute = false;
+            return;
         }
-        if (shouldExecute) {
-            if (command.getRequiredSlots() > 0 && player != null) {
-                if (getEmptySlots(player.getInventory()) < command.getRequiredSlots()) {
-                    shouldExecute = false;
-                }
-            }
-            if (shouldExecute) {
-                plugin.getServer().getScheduler().runTaskLaterAsynchronously(plugin, () -> {
-                    plugin.getServer().getScheduler().runTask(plugin, () -> plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), command.getCommand()));
-                    if (command.isRepeat()) {
-                        long period = command.getRepeatPeriod() > 0 ? 20 * 60 * 60 * command.getRepeatPeriod() : 1;
-                        new BukkitRunnable() {
-                            int executed = 0;
-                            @Override
-                            public void run() {
-                                plugin.getServer().getScheduler().runTask(plugin, () -> plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), command.getCommand()));
-                                executed++;
 
-                                if (executed >= command.getRepeatCycles()) {
-                                    cancel();
-                                }
-                            }
-                        }.runTaskTimerAsynchronously(plugin, period, period);
-                    }
-                }, command.getDelay() > 0 ? 20 * command.getDelay() : 1);
-                MCMarket.getApi().setExecuted(command.getId());
+        if (command.getRequiredSlots() > 0 && player != null) {
+            if (getEmptySlots(player.getInventory()) < command.getRequiredSlots()) {
+                return;
             }
+        }
+
+        if (MCMarket.getApi().setExecuted(command.getId())) {
+            plugin.getServer().getScheduler().runTaskLaterAsynchronously(plugin, () -> {
+                plugin.getServer().getScheduler().runTask(plugin, () -> plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), command.getCommand()));
+                if (command.isRepeat()) {
+                    long period = command.getRepeatPeriod() > 0 ? 20 * 60 * 60 * command.getRepeatPeriod() : 1;
+                    new BukkitRunnable() {
+                        int executed = 0;
+
+                        @Override
+                        public void run() {
+                            plugin.getServer().getScheduler().runTask(plugin, () -> plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), command.getCommand()));
+                            executed++;
+
+                            if (executed >= command.getRepeatCycles()) {
+                                cancel();
+                            }
+                        }
+                    }.runTaskTimerAsynchronously(plugin, period, period);
+                }
+            }, command.getDelay() > 0 ? 20 * command.getDelay() : 1);
         }
     }
 

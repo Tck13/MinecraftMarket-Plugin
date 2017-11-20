@@ -41,11 +41,11 @@ public class PurchasesTask implements Runnable {
 
     private void runCommand(Command command) {
         ProxiedPlayer player = plugin.getProxy().getPlayer(command.getPlayer().getName());
-        boolean shouldExecute = true;
         if (command.isRequiredOnline() && (player == null || !player.isConnected())) {
-            shouldExecute = false;
+            return;
         }
-        if (shouldExecute) {
+
+        if (MCMarket.getApi().setExecuted(command.getId())) {
             plugin.getProxy().getScheduler().schedule(plugin, () -> {
                 plugin.getProxy().getPluginManager().dispatchCommand(plugin.getProxy().getConsole(), command.getCommand());
                 if (command.isRepeat()) {
@@ -65,7 +65,6 @@ public class PurchasesTask implements Runnable {
                     }.schedule(plugin, period, period, TimeUnit.SECONDS);
                 }
             }, command.getDelay() > 0 ? command.getDelay() : 1, TimeUnit.SECONDS);
-            MCMarket.getApi().setExecuted(command.getId());
         }
     }
 }
