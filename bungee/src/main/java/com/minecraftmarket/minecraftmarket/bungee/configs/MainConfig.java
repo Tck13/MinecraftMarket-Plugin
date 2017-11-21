@@ -13,11 +13,11 @@ public class MainConfig extends ConfigFile {
     public MainConfig(Plugin plugin) {
         super(plugin, "bungeeConfig");
 
-        apiKey = config.getString("APIKey");
-        checkInterval = config.getInt("CheckInterval");
-        statistics = config.getBoolean("Statistics");
-        lang = config.getString("Lang");
-        debug = config.getBoolean("Debug");
+        apiKey = config.getString("APIKey", "");
+        checkInterval = config.getInt("CheckInterval", 1);
+        statistics = config.getBoolean("Statistics", true);
+        lang = config.getString("Lang", "en");
+        debug = config.getBoolean("Debug", false);
     }
 
     public void setApiKey(String apiKey) {

@@ -20,16 +20,16 @@ public class MainConfig extends ConfigFile {
     public MainConfig(JavaPlugin plugin) {
         super(plugin, "bukkitConfig");
 
-        apiKey = config.getString("APIKey");
-        checkInterval = config.getInt("CheckInterval");
+        apiKey = config.getString("APIKey", "");
+        checkInterval = config.getInt("CheckInterval", 1);
         shopCommands = config.getStringList("ShopCommands");
-        useGUI = config.getBoolean("UseGUI");
-        useSigns = config.getBoolean("UseSigns");
-        dateFormat = config.getString("DateFormat");
-        defaultHeadSkin = config.getString("DefaultHeadSkin");
-        statistics = config.getBoolean("Statistics");
-        lang = config.getString("Lang");
-        debug = config.getBoolean("Debug");
+        useGUI = config.getBoolean("UseGUI", true);
+        useSigns = config.getBoolean("UseSigns", true);
+        dateFormat = config.getString("DateFormat", "yyyy-MM-dd");
+        defaultHeadSkin = config.getString("DefaultHeadSkin", "https://textures.minecraft.net/texture/5163dafac1d91a8c91db576caac784336791a6e18d8f7f62778fc47bf146b6");
+        statistics = config.getBoolean("Statistics", true);
+        lang = config.getString("Lang", "en");
+        debug = config.getBoolean("Debug", false);
     }
 
     public void setApiKey(String apiKey) {

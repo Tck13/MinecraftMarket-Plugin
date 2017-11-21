@@ -9,7 +9,10 @@ import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.event.EventHandler;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public class BungeeStats extends MCMarketStats {
@@ -19,19 +22,7 @@ public class BungeeStats extends MCMarketStats {
         super(marketApi);
         this.plugin = plugin;
 
-        plugin.getProxy().getPluginManager().registerListener(plugin, new Listener() {
-            @EventHandler
-            public void onPlayerJoin(ServerConnectEvent e) {
-                if (e.getPlayer().getServer() == null) {
-                    events.add(new StatsEvent("player_join", getPlayerData(e.getPlayer())));
-                }
-            }
-
-            @EventHandler
-            public void onPlayerDisconnect(PlayerDisconnectEvent e) {
-                events.add(new StatsEvent("player_leave", getPlayerData(e.getPlayer())));
-            }
-        });
+        plugin.getProxy().getPluginManager().registerListener(plugin, new BungeeEvents());
 
         plugin.getProxy().getScheduler().schedule(plugin, this::runEventsSender, 10, 60, TimeUnit.SECONDS);
     }
@@ -67,8 +58,16 @@ public class BungeeStats extends MCMarketStats {
 
     private Map<String, Object> getPluginData(Plugin plugin) {
         Map<String, Object> data = new HashMap<>();
+        String version = plugin.getDescription().getVersion();
+        if (version.contains(":")) {
+            String[] split = version.split(":");
+            if (split.length == 5) {
+                version = split[2].split("-")[0];
+            }
+        }
+
         data.put("name", plugin.getDescription().getName());
-        data.put("version", plugin.getDescription().getVersion());
+        data.put("version", version);
         data.put("description", plugin.getDescription().getDescription());
         data.put("author", plugin.getDescription().getAuthor());
         return data;
@@ -83,5 +82,19 @@ public class BungeeStats extends MCMarketStats {
         data.put("ping", player.getPing());
         data.put("server", player.getServer().getInfo().getName());
         return data;
+    }
+
+    public class BungeeEvents implements Listener {
+        @EventHandler
+        public void onPlayerJoin(ServerConnectEvent e) {
+            if (e.getPlayer().getServer() == null) {
+                events.add(new StatsEvent("player_join", getPlayerData(e.getPlayer())));
+            }
+        }
+
+        @EventHandler
+        public void onPlayerDisconnect(PlayerDisconnectEvent e) {
+            events.add(new StatsEvent("player_leave", getPlayerData(e.getPlayer())));
+        }
     }
 }

@@ -15,13 +15,13 @@ public class MainConfig extends ConfigFile {
     public MainConfig(PluginBase plugin) {
         super(plugin, "nukkitConfig");
 
-        apiKey = config.getString("APIKey");
-        checkInterval = config.getInt("CheckInterval");
-        useSigns = config.getBoolean("UseSigns");
-        dateFormat = config.getString("DateFormat");
-        statistics = config.getBoolean("Statistics");
-        lang = config.getString("Lang");
-        debug = config.getBoolean("Debug");
+        apiKey = config.getString("APIKey", "");
+        checkInterval = config.getInt("CheckInterval", 1);
+        useSigns = config.getBoolean("UseSigns", true);
+        dateFormat = config.getString("DateFormat", "yyyy-MM-dd");
+        statistics = config.getBoolean("Statistics", true);
+        lang = config.getString("Lang", "en");
+        debug = config.getBoolean("Debug", false);
     }
 
     public void setApiKey(String apiKey) {
