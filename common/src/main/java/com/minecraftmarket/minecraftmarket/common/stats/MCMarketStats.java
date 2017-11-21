@@ -1,9 +1,7 @@
 package com.minecraftmarket.minecraftmarket.common.stats;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.minecraftmarket.minecraftmarket.common.api.MCMarketApi;
-import com.minecraftmarket.minecraftmarket.common.stats.models.StatsEvent;
+import com.minecraftmarket.minecraftmarket.common.api.models.Event;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -12,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 
 abstract class MCMarketStats {
-    private final ObjectMapper OBJECTMAPPER = new ObjectMapper();
     private final MCMarketApi marketApi;
 
     MCMarketStats(MCMarketApi marketApi) {
@@ -37,13 +34,13 @@ abstract class MCMarketStats {
         return Calendar.getInstance().getTimeInMillis() / 1000;
     }
 
-    final List<StatsEvent> events = new ArrayList<>();
+    final List<Event> events = new ArrayList<>();
     private int cycles = 1;
     void runEventsSender() {
-        events.add(new StatsEvent("server_info", getServerData()));
+        events.add(new Event(0, "server_info", getServerData()));
         if (cycles >= 5) {
             new Thread(() -> {
-                if (sendData()) {
+                if (marketApi.sendEvents(events)) {
                     events.clear();
                 }
             }).start();
@@ -51,14 +48,5 @@ abstract class MCMarketStats {
         } else {
             cycles++;
         }
-    }
-
-    private boolean sendData() {
-        try {
-            return marketApi.sendEvents(OBJECTMAPPER.writeValueAsString(events));
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
-        return false;
     }
 }

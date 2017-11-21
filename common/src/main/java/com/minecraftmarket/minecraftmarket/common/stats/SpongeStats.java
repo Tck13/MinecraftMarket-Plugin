@@ -1,7 +1,7 @@
 package com.minecraftmarket.minecraftmarket.common.stats;
 
 import com.minecraftmarket.minecraftmarket.common.api.MCMarketApi;
-import com.minecraftmarket.minecraftmarket.common.stats.models.StatsEvent;
+import com.minecraftmarket.minecraftmarket.common.api.models.Event;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.manipulator.mutable.entity.ExperienceHolderData;
 import org.spongepowered.api.entity.living.player.Player;
@@ -41,12 +41,12 @@ public class SpongeStats extends MCMarketStats {
 
     @Listener
     public void onClientJoin(ClientConnectionEvent.Join e) {
-        events.add(new StatsEvent("player_join", getPlayerData(e.getTargetEntity())));
+        events.add(new Event(0, "player_join", getPlayerData(e.getTargetEntity())));
     }
 
     @Listener
     public void onClientDisconnect(ClientConnectionEvent.Disconnect e) {
-        events.add(new StatsEvent("player_leave", getPlayerData(e.getTargetEntity())));
+        events.add(new Event(0, "player_leave", getPlayerData(e.getTargetEntity())));
     }
 
     @Override

@@ -1,7 +1,7 @@
 package com.minecraftmarket.minecraftmarket.common.stats;
 
 import com.minecraftmarket.minecraftmarket.common.api.MCMarketApi;
-import com.minecraftmarket.minecraftmarket.common.stats.models.StatsEvent;
+import com.minecraftmarket.minecraftmarket.common.api.models.Event;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PlayerDisconnectEvent;
@@ -86,7 +86,7 @@ public class BungeeStats extends MCMarketStats {
         } else if (serverInfo != null) {
             data.put("server", serverInfo.getName());
         } else {
-            data.put("server", null);
+            data.put("server", "Unknown");
         }
         return data;
     }
@@ -96,13 +96,13 @@ public class BungeeStats extends MCMarketStats {
         @EventHandler
         public void onPlayerJoin(ServerConnectEvent e) {
             if (e.getPlayer().getServer() == null) {
-                events.add(new StatsEvent("player_join", getPlayerData(e.getPlayer(), e.getTarget())));
+                events.add(new Event(0, "player_join", getPlayerData(e.getPlayer(), e.getTarget())));
             }
         }
 
         @EventHandler
         public void onPlayerDisconnect(PlayerDisconnectEvent e) {
-            events.add(new StatsEvent("player_leave", getPlayerData(e.getPlayer(), null)));
+            events.add(new Event(0, "player_leave", getPlayerData(e.getPlayer(), null)));
         }
     }
 }

@@ -1,7 +1,7 @@
 package com.minecraftmarket.minecraftmarket.common.stats;
 
 import com.minecraftmarket.minecraftmarket.common.api.MCMarketApi;
-import com.minecraftmarket.minecraftmarket.common.stats.models.StatsEvent;
+import com.minecraftmarket.minecraftmarket.common.api.models.Event;
 import com.minecraftmarket.minecraftmarket.common.utils.Ping;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -28,12 +28,12 @@ public class BukkitStats extends MCMarketStats {
         plugin.getServer().getPluginManager().registerEvents(new Listener() {
             @EventHandler
             public void onPlayerJoin(PlayerJoinEvent e) {
-                events.add(new StatsEvent("player_join", getPlayerData(e.getPlayer())));
+                events.add(new Event(0, "player_join", getPlayerData(e.getPlayer())));
             }
 
             @EventHandler
             public void onPlayerJoin(PlayerQuitEvent e) {
-                events.add(new StatsEvent("player_leave", getPlayerData(e.getPlayer())));
+                events.add(new Event(0, "player_leave", getPlayerData(e.getPlayer())));
             }
         }, plugin);
 

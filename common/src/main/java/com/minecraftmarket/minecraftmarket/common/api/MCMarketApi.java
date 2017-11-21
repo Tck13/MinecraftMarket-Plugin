@@ -479,9 +479,74 @@ public class MCMarketApi {
         return true;
     }
 
-    public boolean sendEvents(String json) {
+    public long getEventsCount() {
         try {
-            makeRequest("/events/", "POST", json);
+            BufferedReader reader = makeRequest("/events", "GET", "");
+            JsonNode response = MAPPER.readTree(reader);
+            return response.get("count").asLong();
+        } catch (Exception e) {
+            if (DEBUG) {
+                e.printStackTrace();
+            }
+        }
+        return 0;
+    }
+
+    public List<Event> getEvents() {
+        return getEvents(1, 0);
+    }
+
+    public List<Event> getEvents(int startPage, int maxPages) {
+        List<Event> events = new ArrayList<>();
+        try {
+            BufferedReader reader = makeRequest("/events", "GET", "&limit=25");
+            JsonNode response = MAPPER.readTree(reader);
+            long count = response.get("count").asLong();
+            long pages = (count / 25) + 1;
+
+            if (startPage <= pages) {
+                pages = pages - (startPage - 1);
+            } else throw new IndexOutOfBoundsException("startPage exceeds the total amount of pages.");
+
+            if (maxPages > 0 && pages > maxPages) {
+                pages = maxPages;
+            }
+
+            for (int i = startPage; i <= pages; i++) {
+                if (i > 1) {
+                    reader = makeRequest("/events", "GET", "&limit=25&offset=" + (25 * (i - 1)));
+                    response = MAPPER.readTree(reader);
+                }
+
+                Iterator<JsonNode> results = response.get("results").elements();
+                while (results.hasNext()) {
+                    JsonNode result = results.next();
+                    events.add(MAPPER.readValue(result.toString(), Event.class));
+                }
+            }
+        } catch (Exception e) {
+            if (DEBUG) {
+                e.printStackTrace();
+            }
+        }
+        return events;
+    }
+
+    public Event getEvent(long eventID) {
+        try {
+            BufferedReader reader = makeRequest(String.format("/events/%s", eventID), "GET", "");
+            return MAPPER.readValue(reader, Event.class);
+        } catch (Exception e) {
+            if (DEBUG) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+
+    public boolean sendEvents(List<Event> events) {
+        try {
+            makeRequest("/events", "POST", MAPPER.writeValueAsString(events));
         } catch (IOException e) {
             if (DEBUG) {
                 e.printStackTrace();
