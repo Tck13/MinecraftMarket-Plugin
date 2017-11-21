@@ -4,15 +4,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.minecraftmarket.minecraftmarket.common.api.models.*;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.zip.GZIPOutputStream;
 
 public class MCMarketApi {
     private final String BASE_URL = "https://www.minecraftmarket.com/api/v1/plugin/";
@@ -566,7 +564,6 @@ public class MCMarketApi {
             conn.setRequestMethod("GET");
         }
 
-        conn.setRequestProperty("Content-Type", "application/json");
         conn.setRequestProperty("Accept", "application/json");
         conn.setRequestProperty("User-Agent", USER_AGENT);
         conn.setUseCaches(false);
@@ -575,15 +572,31 @@ public class MCMarketApi {
         conn.setDoInput(true);
 
         if (method.equals("POST") || method.equals("PUT")) {
+            byte[] compressed = compress(query);
+
+            conn.addRequestProperty("Content-Encoding", "gzip");
+            conn.addRequestProperty("Content-Length", String.valueOf(compressed.length));
+            conn.setRequestProperty("Content-Type", "application/json");
+
             conn.setDoOutput(true);
-            OutputStreamWriter out = new OutputStreamWriter(conn.getOutputStream());
-            out.write(query);
+            DataOutputStream out = new DataOutputStream(conn.getOutputStream());
+            out.write(compressed);
+            out.flush();
             out.close();
+
             conn.getInputStream().close();
             return null;
         }
 
         return new BufferedReader(new InputStreamReader(conn.getInputStream()));
+    }
+
+    private byte[] compress(String str) throws IOException {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        GZIPOutputStream gzip = new GZIPOutputStream(outputStream);
+        gzip.write(str.getBytes("UTF-8"));
+        gzip.close();
+        return outputStream.toByteArray();
     }
 
     private String buildQueryFromFilter(Filter filter) {
