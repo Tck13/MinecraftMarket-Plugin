@@ -16,13 +16,13 @@ public class MainConfig extends ConfigFile {
     public MainConfig(File baseDir) {
         super(baseDir, "spongeConfig");
 
-        apiKey = config.getNode("APIKey").getString();
-        checkInterval = config.getNode("CheckInterval").getInt();
-        useSigns = config.getNode("UseSigns").getBoolean();
-        dateFormat = config.getNode("DateFormat").getString();
-        statistics = config.getNode("Statistics").getBoolean();
-        lang = config.getNode("Lang").getString();
-        debug = config.getNode("Debug").getBoolean();
+        apiKey = config.getNode("APIKey").getString("");
+        checkInterval = config.getNode("CheckInterval").getInt(1);
+        useSigns = config.getNode("UseSigns").getBoolean(true);
+        dateFormat = config.getNode("DateFormat").getString("yyyy-MM-dd");
+        statistics = config.getNode("Statistics").getBoolean(true);
+        lang = config.getNode("Lang").getString("en");
+        debug = config.getNode("Debug").getBoolean(false);
     }
 
     public void setApiKey(String apiKey) {

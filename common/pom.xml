@@ -7,7 +7,7 @@
     <parent>
         <artifactId>MinecraftMarket</artifactId>
         <groupId>com.minecraftmarket</groupId>
-        <version>3.6.1</version>
+        <version>3.6.2</version>
     </parent>
 
     <artifactId>common</artifactId>

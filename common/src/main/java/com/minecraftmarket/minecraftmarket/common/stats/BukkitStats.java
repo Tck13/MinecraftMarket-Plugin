@@ -1,7 +1,7 @@
 package com.minecraftmarket.minecraftmarket.common.stats;
 
 import com.minecraftmarket.minecraftmarket.common.api.MCMarketApi;
-import com.minecraftmarket.minecraftmarket.common.stats.models.StatsEvent;
+import com.minecraftmarket.minecraftmarket.common.api.models.Event;
 import com.minecraftmarket.minecraftmarket.common.utils.Ping;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -11,7 +11,12 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class BukkitStats extends MCMarketStats {
     private final JavaPlugin plugin;
@@ -23,12 +28,12 @@ public class BukkitStats extends MCMarketStats {
         plugin.getServer().getPluginManager().registerEvents(new Listener() {
             @EventHandler
             public void onPlayerJoin(PlayerJoinEvent e) {
-                events.add(new StatsEvent("player_join", getPlayerData(e.getPlayer())));
+                events.add(new Event(0, "player_join", getPlayerData(e.getPlayer())));
             }
 
             @EventHandler
             public void onPlayerJoin(PlayerQuitEvent e) {
-                events.add(new StatsEvent("player_leave", getPlayerData(e.getPlayer())));
+                events.add(new Event(0, "player_leave", getPlayerData(e.getPlayer())));
             }
         }, plugin);
 
@@ -87,7 +92,7 @@ public class BukkitStats extends MCMarketStats {
         data.put("time", getTime());
         data.put("username", player.getName());
         data.put("uuid", player.getUniqueId());
-        data.put("ip", player.getAddress().getHostName());
+        data.put("ip", player.getAddress().getAddress().getHostAddress());
         data.put("ping", Ping.getPing(player));
         data.put("is_op", player.isOp());
         data.put("world", player.getWorld().getName());

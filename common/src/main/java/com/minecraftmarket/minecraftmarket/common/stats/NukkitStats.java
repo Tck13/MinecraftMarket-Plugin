@@ -7,9 +7,14 @@ import cn.nukkit.event.player.PlayerJoinEvent;
 import cn.nukkit.event.player.PlayerQuitEvent;
 import cn.nukkit.plugin.Plugin;
 import com.minecraftmarket.minecraftmarket.common.api.MCMarketApi;
-import com.minecraftmarket.minecraftmarket.common.stats.models.StatsEvent;
+import com.minecraftmarket.minecraftmarket.common.api.models.Event;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class NukkitStats extends MCMarketStats {
     private final Plugin plugin;
@@ -21,12 +26,12 @@ public class NukkitStats extends MCMarketStats {
         plugin.getServer().getPluginManager().registerEvents(new Listener() {
             @EventHandler
             public void onPlayerJoin(PlayerJoinEvent e) {
-                events.add(new StatsEvent("player_join", getPlayerData(e.getPlayer())));
+                events.add(new Event(0, "player_join", getPlayerData(e.getPlayer())));
             }
 
             @EventHandler
             public void onPlayerJoin(PlayerQuitEvent e) {
-                events.add(new StatsEvent("player_leave", getPlayerData(e.getPlayer())));
+                events.add(new Event(0, "player_leave", getPlayerData(e.getPlayer())));
             }
         }, plugin);
 
