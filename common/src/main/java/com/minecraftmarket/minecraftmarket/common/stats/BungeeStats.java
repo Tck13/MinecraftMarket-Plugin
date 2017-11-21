@@ -80,10 +80,10 @@ public class BungeeStats extends MCMarketStats {
         data.put("uuid", player.getUniqueId());
         data.put("ip", player.getAddress().getHostName());
         data.put("ping", player.getPing());
-        data.put("server", player.getServer().getInfo().getName());
         return data;
     }
 
+    // Use a public class because Bungee doesn't like private :(
     public class BungeeEvents implements Listener {
         @EventHandler
         public void onPlayerJoin(ServerConnectEvent e) {
