@@ -41,7 +41,7 @@ public class MCMarketApi {
 
     public boolean authAPI() {
         try {
-            makeRequest("/market", "GET", true, "");
+            makeRequest("/market", "GET", "");
             return true;
         } catch (IOException e) {
             if (DEBUG) {
@@ -53,7 +53,7 @@ public class MCMarketApi {
 
     public Market getMarket() {
         try {
-            BufferedReader reader = makeRequest("/market", "GET", true, "");
+            BufferedReader reader = makeRequest("/market", "GET", "");
             return MAPPER.readValue(reader, Market.class);
         } catch (Exception e) {
             if (DEBUG) {
@@ -65,7 +65,7 @@ public class MCMarketApi {
 
     public long getCategoriesCount() {
         try {
-            BufferedReader reader = makeRequest("/categories", "GET", true, "");
+            BufferedReader reader = makeRequest("/categories", "GET", "");
             JsonNode response = MAPPER.readTree(reader);
             return response.get("count").asLong();
         } catch (Exception e) {
@@ -83,7 +83,7 @@ public class MCMarketApi {
     public List<Category> getCategories(int startPage, int maxPages) {
         List<Category> categories = new ArrayList<>();
         try {
-            BufferedReader reader = makeRequest("/categories", "GET", true, "&limit=25");
+            BufferedReader reader = makeRequest("/categories", "GET", "&limit=25");
             JsonNode response = MAPPER.readTree(reader);
             long count = response.get("count").asLong();
             long pages = (count / 25) + 1;
@@ -98,7 +98,7 @@ public class MCMarketApi {
 
             for (int i = startPage; i <= pages; i++) {
                 if (i > 1) {
-                    reader = makeRequest("/categories", "GET", true, "&limit=25&offset=" + (25 * (i - 1)));
+                    reader = makeRequest("/categories", "GET", "&limit=25&offset=" + (25 * (i - 1)));
                     response = MAPPER.readTree(reader);
                 }
 
@@ -121,7 +121,7 @@ public class MCMarketApi {
 
     public Category getCategory(long categoryID) {
         try {
-            BufferedReader reader = makeRequest(String.format("/categories/%s", categoryID), "GET", true, "");
+            BufferedReader reader = makeRequest(String.format("/categories/%s", categoryID), "GET", "");
             JsonNode response = MAPPER.readTree(reader);
             long id = response.get("id").asLong();
             String name = response.get("name").asText();
@@ -154,7 +154,7 @@ public class MCMarketApi {
 
     public long getItemsCount(long categoryID) {
         try {
-            BufferedReader reader = makeRequest("/items", "GET", true, categoryID > 0 ? "&category=" + categoryID : "");
+            BufferedReader reader = makeRequest("/items", "GET", categoryID > 0 ? "&category=" + categoryID : "");
             JsonNode response = MAPPER.readTree(reader);
             return response.get("count").asLong();
         } catch (Exception e) {
@@ -176,7 +176,7 @@ public class MCMarketApi {
     public List<Item> getItems(long categoryID, int startPage, int maxPages) {
         List<Item> items = new ArrayList<>();
         try {
-            BufferedReader reader = makeRequest("/items", "GET", true, "&limit=25" + (categoryID > 0 ? "&category=" + categoryID : ""));
+            BufferedReader reader = makeRequest("/items", "GET", "&limit=25" + (categoryID > 0 ? "&category=" + categoryID : ""));
             JsonNode response = MAPPER.readTree(reader);
             long count = response.get("count").asLong();
             long pages = (count / 25) + 1;
@@ -191,7 +191,7 @@ public class MCMarketApi {
 
             for (int i = startPage; i <= pages; i++) {
                 if (i > 1) {
-                    reader = makeRequest("/items", "GET", true, "&limit=25&offset=" + (25 * (i - 1)) + (categoryID > 0 ? "&category=" + categoryID : ""));
+                    reader = makeRequest("/items", "GET", "&limit=25&offset=" + (25 * (i - 1)) + (categoryID > 0 ? "&category=" + categoryID : ""));
                     response = MAPPER.readTree(reader);
                 }
 
@@ -211,7 +211,7 @@ public class MCMarketApi {
 
     public Item getItem(long itemID) {
         try {
-            BufferedReader reader = makeRequest(String.format("/items/%s", itemID), "GET", true, "");
+            BufferedReader reader = makeRequest(String.format("/items/%s", itemID), "GET", "");
             return MAPPER.readValue(reader, Item.class);
         } catch (Exception e) {
             if (DEBUG) {
@@ -228,7 +228,7 @@ public class MCMarketApi {
     public long getTransactionsCount(TransactionStatus transactionStatus) {
         try {
             String query = buildQueryFromFilter(transactionStatus);
-            BufferedReader reader = makeRequest("/transactions", "GET", true, query);
+            BufferedReader reader = makeRequest("/transactions", "GET", query);
             JsonNode response = MAPPER.readTree(reader);
             return response.get("count").asLong();
         } catch (Exception e) {
@@ -255,7 +255,7 @@ public class MCMarketApi {
         List<Transaction> transactions = new ArrayList<>();
         try {
             String query = buildQueryFromFilter(transactionStatus);
-            BufferedReader reader = makeRequest("/transactions", "GET", true, "&limit=25" + query);
+            BufferedReader reader = makeRequest("/transactions", "GET", "&limit=25" + query);
             JsonNode response = MAPPER.readTree(reader);
             long count = response.get("count").asLong();
             long pages = (count / 25) + 1;
@@ -270,7 +270,7 @@ public class MCMarketApi {
 
             for (int i = startPage; i <= pages; i++) {
                 if (i > 1) {
-                    reader = makeRequest("/transactions", "GET", true, "&limit=25&offset=" + (25 * (i - 1)) + query);
+                    reader = makeRequest("/transactions", "GET", "&limit=25&offset=" + (25 * (i - 1)) + query);
                     response = MAPPER.readTree(reader);
                 }
 
@@ -293,7 +293,7 @@ public class MCMarketApi {
 
     public Transaction getTransaction(long transactionID) {
         try {
-            BufferedReader reader = makeRequest(String.format("/transactions/%s", transactionID), "GET", true, "");
+            BufferedReader reader = makeRequest(String.format("/transactions/%s", transactionID), "GET", "");
             JsonNode response = MAPPER.readTree(reader);
             long id = response.get("id").asLong();
             String status = response.get("status").asText();
@@ -325,7 +325,7 @@ public class MCMarketApi {
 
     public long getPurchasesCount() {
         try {
-            BufferedReader reader = makeRequest("/purchases", "GET", true, "");
+            BufferedReader reader = makeRequest("/purchases", "GET", "");
             JsonNode response = MAPPER.readTree(reader);
             return response.get("count").asLong();
         } catch (Exception e) {
@@ -343,7 +343,7 @@ public class MCMarketApi {
     public List<Purchase> getPurchases(int startPage, int maxPages) {
         List<Purchase> purchases = new ArrayList<>();
         try {
-            BufferedReader reader = makeRequest("/purchases", "GET", true, "&limit=25");
+            BufferedReader reader = makeRequest("/purchases", "GET", "&limit=25");
             JsonNode response = MAPPER.readTree(reader);
             long count = response.get("count").asLong();
             long pages = (count / 25) + 1;
@@ -358,7 +358,7 @@ public class MCMarketApi {
 
             for (int i = startPage; i <= pages; i++) {
                 if (i > 1) {
-                    reader = makeRequest("/purchases", "GET", true, "&limit=25&offset=" + (25 * (i - 1)));
+                    reader = makeRequest("/purchases", "GET", "&limit=25&offset=" + (25 * (i - 1)));
                     response = MAPPER.readTree(reader);
                 }
 
@@ -378,7 +378,7 @@ public class MCMarketApi {
 
     public Purchase getPurchase(long purchaseID) {
         try {
-            BufferedReader reader = makeRequest(String.format("/purchases/%s", purchaseID), "GET", true, "");
+            BufferedReader reader = makeRequest(String.format("/purchases/%s", purchaseID), "GET", "");
             return MAPPER.readValue(reader, Purchase.class);
         } catch (Exception e) {
             if (DEBUG) {
@@ -395,7 +395,7 @@ public class MCMarketApi {
     public long getCommandsCount(CommandType commandType) {
         try {
             String query = buildQueryFromFilter(commandType);
-            BufferedReader reader = makeRequest("/commands", "GET", true, query);
+            BufferedReader reader = makeRequest("/commands", "GET", query);
             JsonNode response = MAPPER.readTree(reader);
             return response.get("count").asLong();
         } catch (Exception e) {
@@ -422,7 +422,7 @@ public class MCMarketApi {
         List<Command> commands = new ArrayList<>();
         try {
             String query = buildQueryFromFilter(commandType);
-            BufferedReader reader = makeRequest("/commands", "GET", true, "&limit=25" + query);
+            BufferedReader reader = makeRequest("/commands", "GET", "&limit=25" + query);
             JsonNode response = MAPPER.readTree(reader);
             long count = response.get("count").asLong();
             long pages = (count / 25) + 1;
@@ -437,7 +437,7 @@ public class MCMarketApi {
 
             for (int i = startPage; i <= pages; i++) {
                 if (i > 1) {
-                    reader = makeRequest("/commands", "GET", true, "&limit=25&offset=" + (25 * (i - 1)) + query);
+                    reader = makeRequest("/commands", "GET", "&limit=25&offset=" + (25 * (i - 1)) + query);
                     response = MAPPER.readTree(reader);
                 }
 
@@ -457,7 +457,7 @@ public class MCMarketApi {
 
     public Command getCommand(long commandID) {
         try {
-            BufferedReader reader = makeRequest(String.format("/commands/%s", commandID), "GET", true, "");
+            BufferedReader reader = makeRequest(String.format("/commands/%s", commandID), "GET", "");
             return MAPPER.readValue(reader, Command.class);
         } catch (Exception e) {
             if (DEBUG) {
@@ -469,7 +469,7 @@ public class MCMarketApi {
 
     public boolean setExecuted(long commandID) {
         try {
-            makeRequest(String.format("/commands/%s", commandID), "PUT", false, "{\"executed\":1}");
+            makeRequest(String.format("/commands/%s", commandID), "PUT", "{\"executed\":1}");
         } catch (IOException e) {
             if (DEBUG) {
                 e.printStackTrace();
@@ -481,7 +481,7 @@ public class MCMarketApi {
 
     public boolean sendEvents(String json) {
         try {
-            makeRequest("/events/", "POST", false, json);
+            makeRequest("/events/", "POST", json);
         } catch (IOException e) {
             if (DEBUG) {
                 e.printStackTrace();
@@ -491,7 +491,7 @@ public class MCMarketApi {
         return true;
     }
 
-    private BufferedReader makeRequest(String url, String method, boolean getInput, String query) throws IOException {
+    private BufferedReader makeRequest(String url, String method, String query) throws IOException {
         HttpURLConnection conn;
         if (method.equals("POST") || method.equals("PUT")) {
             conn = (HttpURLConnection) new URL(BASE_URL + API_KEY + url + "?format=json").openConnection();
@@ -514,14 +514,11 @@ public class MCMarketApi {
             OutputStreamWriter out = new OutputStreamWriter(conn.getOutputStream());
             out.write(query);
             out.close();
-        }
-
-        if (getInput) {
-            return new BufferedReader(new InputStreamReader(conn.getInputStream()));
-        } else {
             conn.getInputStream().close();
             return null;
         }
+
+        return new BufferedReader(new InputStreamReader(conn.getInputStream()));
     }
 
     private String buildQueryFromFilter(Filter filter) {
