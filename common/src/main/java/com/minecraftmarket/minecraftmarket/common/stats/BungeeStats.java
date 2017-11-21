@@ -2,6 +2,7 @@ package com.minecraftmarket.minecraftmarket.common.stats;
 
 import com.minecraftmarket.minecraftmarket.common.api.MCMarketApi;
 import com.minecraftmarket.minecraftmarket.common.stats.models.StatsEvent;
+import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PlayerDisconnectEvent;
 import net.md_5.bungee.api.event.ServerConnectEvent;
@@ -50,7 +51,7 @@ public class BungeeStats extends MCMarketStats {
 
         List<Map<String, Object>> onlinePlayers = new ArrayList<>();
         for (ProxiedPlayer player : plugin.getProxy().getPlayers()) {
-            onlinePlayers.add(getPlayerData(player));
+            onlinePlayers.add(getPlayerData(player, null));
         }
         data.put("online_players", onlinePlayers);
         return data;
@@ -73,13 +74,20 @@ public class BungeeStats extends MCMarketStats {
         return data;
     }
 
-    private Map<String, Object> getPlayerData(ProxiedPlayer player) {
+    private Map<String, Object> getPlayerData(ProxiedPlayer player, ServerInfo serverInfo) {
         Map<String, Object> data = new HashMap<>();
         data.put("time", getTime());
         data.put("username", player.getName());
         data.put("uuid", player.getUniqueId());
         data.put("ip", player.getAddress().getAddress().getHostAddress());
         data.put("ping", player.getPing());
+        if (player.getServer() != null) {
+            data.put("server", player.getServer().getInfo().getName());
+        } else if (serverInfo != null) {
+            data.put("server", serverInfo.getName());
+        } else {
+            data.put("server", null);
+        }
         return data;
     }
 
@@ -88,13 +96,13 @@ public class BungeeStats extends MCMarketStats {
         @EventHandler
         public void onPlayerJoin(ServerConnectEvent e) {
             if (e.getPlayer().getServer() == null) {
-                events.add(new StatsEvent("player_join", getPlayerData(e.getPlayer())));
+                events.add(new StatsEvent("player_join", getPlayerData(e.getPlayer(), e.getTarget())));
             }
         }
 
         @EventHandler
         public void onPlayerDisconnect(PlayerDisconnectEvent e) {
-            events.add(new StatsEvent("player_leave", getPlayerData(e.getPlayer())));
+            events.add(new StatsEvent("player_leave", getPlayerData(e.getPlayer(), null)));
         }
     }
 }
