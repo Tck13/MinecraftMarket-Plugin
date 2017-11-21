@@ -5,10 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.minecraftmarket.minecraftmarket.common.api.models.*;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -561,10 +560,10 @@ public class MCMarketApi {
     private BufferedReader makeRequest(String url, String method, String query) throws IOException {
         HttpURLConnection conn;
         if (method.equals("POST") || method.equals("PUT")) {
-            conn = (HttpURLConnection) new URL(BASE_URL + API_KEY + url + "?format=json").openConnection();
+            conn = (HttpURLConnection) new URL(BASE_URL + API_KEY + url + "/?format=json").openConnection();
             conn.setRequestMethod(method);
         } else {
-            conn = (HttpURLConnection) new URL(BASE_URL + API_KEY + url + "?format=json" + query).openConnection();
+            conn = (HttpURLConnection) new URL(BASE_URL + API_KEY + url + "/?format=json" + query).openConnection();
             conn.setRequestMethod("GET");
         }
 
@@ -576,15 +575,17 @@ public class MCMarketApi {
         conn.setDoInput(true);
 
         if (method.equals("POST") || method.equals("PUT")) {
+            /* Maybe later
             byte[] compressed = compress(query);
-
             conn.addRequestProperty("Content-Encoding", "gzip");
-            conn.addRequestProperty("Content-Length", String.valueOf(compressed.length));
+            */
+
+            conn.addRequestProperty("Content-Length", String.valueOf(query.length()));
             conn.setRequestProperty("Content-Type", "application/json");
 
             conn.setDoOutput(true);
-            DataOutputStream out = new DataOutputStream(conn.getOutputStream());
-            out.write(compressed);
+            OutputStreamWriter out = new OutputStreamWriter(conn.getOutputStream());
+            out.write(query);
             out.flush();
             out.close();
 
@@ -595,6 +596,7 @@ public class MCMarketApi {
         return new BufferedReader(new InputStreamReader(conn.getInputStream()));
     }
 
+    /* Maybe later
     private byte[] compress(String str) throws IOException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         GZIPOutputStream gzip = new GZIPOutputStream(outputStream);
@@ -602,6 +604,7 @@ public class MCMarketApi {
         gzip.close();
         return outputStream.toByteArray();
     }
+    */
 
     private String buildQueryFromFilter(Filter filter) {
         if (filter != null) {
