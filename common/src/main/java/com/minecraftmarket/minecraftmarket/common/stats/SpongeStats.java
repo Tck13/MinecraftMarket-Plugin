@@ -85,7 +85,7 @@ public class SpongeStats extends MCMarketStats {
         data.put("time", getTime());
         data.put("username", player.getName());
         data.put("uuid", player.getUniqueId());
-        data.put("ip", player.getConnection().getAddress().getHostName());
+        data.put("ip", player.getConnection().getAddress().getAddress().getHostAddress());
         data.put("ping", player.getConnection().getLatency());
         data.put("is_op", player.hasPermission("sponge.command"));
         data.put("world", player.getWorld().getName());

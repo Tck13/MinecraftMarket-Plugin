@@ -78,7 +78,7 @@ public class BungeeStats extends MCMarketStats {
         data.put("time", getTime());
         data.put("username", player.getName());
         data.put("uuid", player.getUniqueId());
-        data.put("ip", player.getAddress().getHostName());
+        data.put("ip", player.getAddress().getAddress().getHostAddress());
         data.put("ping", player.getPing());
         return data;
     }

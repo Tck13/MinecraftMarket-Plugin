@@ -92,7 +92,7 @@ public class BukkitStats extends MCMarketStats {
         data.put("time", getTime());
         data.put("username", player.getName());
         data.put("uuid", player.getUniqueId());
-        data.put("ip", player.getAddress().getHostName());
+        data.put("ip", player.getAddress().getAddress().getHostAddress());
         data.put("ping", Ping.getPing(player));
         data.put("is_op", player.isOp());
         data.put("world", player.getWorld().getName());
