@@ -16,7 +16,7 @@ import java.util.Iterator;
 import java.util.List;
 
 public class MCMarketApi {
-    private final String BASE_URL = "http://minecraftmarket.local/api/v1/plugin/";
+    private final String BASE_URL = "https://www.minecraftmarket.com/api/v1/plugin/";
     private final ObjectMapper MAPPER = new ObjectMapper().registerModule(new Jdk8Module());
     private final String API_KEY;
     private final String USER_AGENT;
