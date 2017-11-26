@@ -1,18 +1,22 @@
 package com.minecraftmarket.minecraftmarket.common.stats;
 
 import cn.nukkit.Player;
+import cn.nukkit.Server;
 import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.Listener;
 import cn.nukkit.event.player.PlayerJoinEvent;
 import cn.nukkit.event.player.PlayerQuitEvent;
 import cn.nukkit.plugin.Plugin;
 import com.minecraftmarket.minecraftmarket.common.api.MCMarketApi;
-import com.minecraftmarket.minecraftmarket.common.api.models.Event;
+import com.minecraftmarket.minecraftmarket.common.api.models.PlayerSession;
+import com.minecraftmarket.minecraftmarket.common.api.models.ServerInfo;
+import com.minecraftmarket.minecraftmarket.common.api.models.ServerPlayer;
+import com.minecraftmarket.minecraftmarket.common.api.models.ServerPlugin;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -26,12 +30,15 @@ public class NukkitStats extends MCMarketStats {
         plugin.getServer().getPluginManager().registerEvents(new Listener() {
             @EventHandler
             public void onPlayerJoin(PlayerJoinEvent e) {
-                events.add(new Event(0, "player_join", getPlayerData(e.getPlayer())));
+                playerJoins.put(e.getPlayer().getUniqueId(), getTime());
             }
 
             @EventHandler
-            public void onPlayerJoin(PlayerQuitEvent e) {
-                events.add(new Event(0, "player_leave", getPlayerData(e.getPlayer())));
+            public void onPlayerQuit(PlayerQuitEvent e) {
+                if (playerJoins.containsKey(e.getPlayer().getUniqueId())) {
+                    playerSession.add(getPlayerSession(e.getPlayer()));
+                    playerJoins.remove(e.getPlayer().getUniqueId());
+                }
             }
         }, plugin);
 
@@ -51,50 +58,82 @@ public class NukkitStats extends MCMarketStats {
     }
 
     @Override
-    Map<String, Object> getServerData() {
-        Map<String, Object> data = super.getServerData();
-        data.put("type", "Bukkit");
-        data.put("version", plugin.getServer().getVersion());
+    ServerInfo getServerInfo() {
+        Map<String, Object> system = getSystemStats();
 
-        List<Map<String, Object>> plugins = new ArrayList<>();
-        for (Plugin plugin : plugin.getServer().getPluginManager().getPlugins().values()) {
-            plugins.add(getPluginData(plugin));
-        }
-        data.put("plugins", plugins);
+        String version = plugin.getServer().getVersion();
+        version = version.substring(version.indexOf("MC: ") + 4, version.length() - 1);
 
-        List<Map<String, Object>> onlinePlayers = new ArrayList<>();
+        return new ServerInfo(
+                0,
+                getTime(),
+                "Nukkit",
+                version,
+                true,
+                plugin.getServer().getIp(),
+                plugin.getServer().getPort(),
+                Math.min(plugin.getServer().getTicksPerSecond(), 20.0),
+                (String) system.get("javaVersion"),
+                (String) system.get("osName"),
+                (String) system.get("osArch"),
+                (String) system.get("osVersion"),
+                (long) system.get("maxMemory"),
+                (long) system.get("totalMemory"),
+                (long) system.get("freeMemory"),
+                (long) system.get("cores"),
+                (double) system.get("cpuUsage"),
+                getOnlinePlayers(),
+                getPlugins()
+        );
+    }
+
+    private List<ServerPlayer> getOnlinePlayers() {
+        List<ServerPlayer> players = new ArrayList<>();
         for (Player player : plugin.getServer().getOnlinePlayers().values()) {
-            onlinePlayers.add(getPlayerData(player));
+            players.add(new ServerPlayer(
+                    player.getName(),
+                    player.getUniqueId().toString(),
+                    player.getAddress(),
+                    player.getPing(),
+                    Optional.of(player.isOp()),
+                    Optional.of(player.getLevel().getName()),
+                    Optional.of((long) player.getLocation().getFloorX()),
+                    Optional.of((long) player.getLocation().getFloorY()),
+                    Optional.of((long) player.getLocation().getFloorZ()),
+                    Optional.of(Server.getGamemodeString(player.getGamemode(), true)),
+                    Optional.of((double) player.getHealth()),
+                    Optional.of((double) player.getMaxHealth()),
+                    Optional.of((long) player.getExperienceLevel()),
+                    Optional.of((float) player.getExperience()),
+                    Optional.of((long) player.getFoodData().getLevel()),
+                    Optional.empty()
+            ));
         }
-        data.put("online_players", onlinePlayers);
-        return data;
+        return players;
     }
 
-    private Map<String, Object> getPluginData(Plugin plugin) {
-        Map<String, Object> data = new HashMap<>();
-        data.put("name", plugin.getName());
-        data.put("version", plugin.getDescription().getVersion());
-        data.put("description", plugin.getDescription().getDescription());
-        data.put("website", plugin.getDescription().getWebsite());
-        data.put("authors", plugin.getDescription().getAuthors());
-        return data;
+    private List<ServerPlugin> getPlugins() {
+        List<ServerPlugin> plugins = new ArrayList<>();
+        for (Plugin plugin : plugin.getServer().getPluginManager().getPlugins().values()) {
+            plugins.add(new ServerPlugin(
+                    plugin.getName(),
+                    plugin.getDescription().getVersion(),
+                    plugin.getDescription().getDescription(),
+                    String.join(", ", plugin.getDescription().getAuthors()),
+                    Optional.of(plugin.getDescription().getWebsite())
+            ));
+        }
+        return plugins;
     }
 
-    private Map<String, Object> getPlayerData(Player player) {
-        Map<String, Object> data = new HashMap<>();
-        data.put("time", getTime());
-        data.put("username", player.getName());
-        data.put("uuid", player.getUniqueId());
-        data.put("ip", player.getAddress());
-        data.put("ping", player.getPing());
-        data.put("is_op", player.isOp());
-        data.put("world", player.getLevel().getName());
-        data.put("gamemode", player.getGamemode());
-        data.put("health", player.getHealth());
-        data.put("max_health", player.getMaxHealth());
-        data.put("level", player.getExperienceLevel());
-        data.put("exp", player.getExperience());
-        data.put("food", player.getFoodData().getLevel());
-        return data;
+    private PlayerSession getPlayerSession(Player player) {
+        return new PlayerSession(
+                0,
+                player.getName(),
+                player.getUniqueId().toString(),
+                playerJoins.get(player.getUniqueId()),
+                getTime(),
+                player.getAddress()
+        );
     }
 }

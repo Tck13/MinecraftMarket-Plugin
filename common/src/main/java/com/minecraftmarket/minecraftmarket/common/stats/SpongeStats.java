@@ -1,7 +1,10 @@
 package com.minecraftmarket.minecraftmarket.common.stats;
 
 import com.minecraftmarket.minecraftmarket.common.api.MCMarketApi;
-import com.minecraftmarket.minecraftmarket.common.api.models.Event;
+import com.minecraftmarket.minecraftmarket.common.api.models.PlayerSession;
+import com.minecraftmarket.minecraftmarket.common.api.models.ServerInfo;
+import com.minecraftmarket.minecraftmarket.common.api.models.ServerPlayer;
+import com.minecraftmarket.minecraftmarket.common.api.models.ServerPlugin;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.manipulator.mutable.entity.ExperienceHolderData;
 import org.spongepowered.api.entity.living.player.Player;
@@ -9,8 +12,8 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.plugin.PluginContainer;
 
+import java.net.InetSocketAddress;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -41,66 +44,108 @@ public class SpongeStats extends MCMarketStats {
 
     @Listener
     public void onClientJoin(ClientConnectionEvent.Join e) {
-        events.add(new Event(0, "player_join", getPlayerData(e.getTargetEntity())));
+        playerJoins.put(e.getTargetEntity().getUniqueId(), getTime());
     }
 
     @Listener
     public void onClientDisconnect(ClientConnectionEvent.Disconnect e) {
-        events.add(new Event(0, "player_leave", getPlayerData(e.getTargetEntity())));
+        if (playerJoins.containsKey(e.getTargetEntity().getUniqueId())) {
+            playerSession.add(getPlayerSession(e.getTargetEntity()));
+            playerJoins.remove(e.getTargetEntity().getUniqueId());
+        }
     }
 
     @Override
-    Map<String, Object> getServerData() {
-        Map<String, Object> data = super.getServerData();
-        data.put("type", "Sponge");
-        data.put("version", Sponge.getGame().getPlatform().getMinecraftVersion().getName());
-        data.put("online_mode", Sponge.getServer().getOnlineMode());
+    ServerInfo getServerInfo() {
+        Map<String, Object> system = getSystemStats();
 
-        List<Map<String, Object>> plugins = new ArrayList<>();
-        for (PluginContainer plugin : Sponge.getPluginManager().getPlugins()) {
-            plugins.add(getPluginData(plugin));
+        String ip = "";
+        int port = 25565;
+        Optional<InetSocketAddress> address = Sponge.getServer().getBoundAddress();
+        if (address.isPresent()) {
+            ip = address.get().getAddress().getHostAddress();
+            port = address.get().getPort();
         }
-        data.put("plugins", plugins);
+        return new ServerInfo(
+                0,
+                getTime(),
+                "Sponge",
+                Sponge.getGame().getPlatform().getMinecraftVersion().getName(),
+                Sponge.getServer().getOnlineMode(),
+                ip,
+                port,
+                Sponge.getServer().getTicksPerSecond(),
+                (String) system.get("javaVersion"),
+                (String) system.get("osName"),
+                (String) system.get("osArch"),
+                (String) system.get("osVersion"),
+                (long) system.get("maxMemory"),
+                (long) system.get("totalMemory"),
+                (long) system.get("freeMemory"),
+                (long) system.get("cores"),
+                (double) system.get("cpuUsage"),
+                getOnlinePlayers(),
+                getPlugins()
+        );
+    }
 
-        List<Map<String, Object>> onlinePlayers = new ArrayList<>();
+    private List<ServerPlayer> getOnlinePlayers() {
+        List<ServerPlayer> players = new ArrayList<>();
         for (Player player : Sponge.getServer().getOnlinePlayers()) {
-            onlinePlayers.add(getPlayerData(player));
+            Optional<ExperienceHolderData> experienceData = player.get(ExperienceHolderData.class);
+            Optional<Long> level;
+            Optional<Float> exp;
+            if (experienceData.isPresent()) {
+                level = Optional.of((long) experienceData.get().level().get());
+                exp = Optional.of((float) experienceData.get().totalExperience().get());
+            } else {
+                level = Optional.empty();
+                exp = Optional.empty();
+            }
+            players.add(new ServerPlayer(
+                    player.getName(),
+                    player.getUniqueId().toString(),
+                    player.getConnection().getAddress().getAddress().getHostAddress(),
+                    player.getConnection().getLatency(),
+                    Optional.empty(),
+                    Optional.of(player.getWorld().getName()),
+                    Optional.of((long) player.getLocation().getBlockX()),
+                    Optional.of((long) player.getLocation().getBlockY()),
+                    Optional.of((long) player.getLocation().getBlockZ()),
+                    Optional.of(player.gameMode().get().getName()),
+                    Optional.of(player.health().get()),
+                    Optional.of(player.maxHealth().get()),
+                    level,
+                    exp,
+                    Optional.of((long) player.foodLevel().get()),
+                    Optional.empty()
+            ));
         }
-        data.put("online_players", onlinePlayers);
-        return data;
+        return players;
     }
 
-    private Map<String, Object> getPluginData(PluginContainer plugin) {
-        Map<String, Object> data = new HashMap<>();
-        data.put("name", plugin.getName());
-        data.put("version", plugin.getVersion().orElse("Unknown"));
-        data.put("description", plugin.getDescription().orElse("Unknown"));
-        data.put("website", plugin.getUrl().orElse("Unknown"));
-        data.put("authors", plugin.getAuthors());
-        return data;
+    private List<ServerPlugin> getPlugins() {
+        List<ServerPlugin> plugins = new ArrayList<>();
+        for (PluginContainer plugin : Sponge.getPluginManager().getPlugins()) {
+            plugins.add(new ServerPlugin(
+                    plugin.getName(),
+                    plugin.getVersion().orElse("Unknown"),
+                    plugin.getDescription().orElse("Unknown"),
+                    String.join(", ", plugin.getAuthors()),
+                    Optional.of(plugin.getUrl().orElse("Unknown"))
+            ));
+        }
+        return plugins;
     }
 
-    private Map<String, Object> getPlayerData(Player player) {
-        Map<String, Object> data = new HashMap<>();
-        data.put("time", getTime());
-        data.put("username", player.getName());
-        data.put("uuid", player.getUniqueId());
-        data.put("ip", player.getConnection().getAddress().getAddress().getHostAddress());
-        data.put("ping", player.getConnection().getLatency());
-        data.put("is_op", player.hasPermission("sponge.command"));
-        data.put("world", player.getWorld().getName());
-        data.put("gamemode", player.gameMode().get().getName());
-        data.put("health", player.health().get());
-        data.put("max_health", player.maxHealth().get());
-        Optional<ExperienceHolderData> experienceData = player.get(ExperienceHolderData.class);
-        if (experienceData.isPresent()) {
-            data.put("level", experienceData.get().level().get());
-            data.put("exp", experienceData.get().totalExperience().get());
-        } else {
-            data.put("level", "Unknown");
-            data.put("exp", "Unknown");
-        }
-        data.put("food", player.foodLevel().get());
-        return data;
+    private PlayerSession getPlayerSession(Player player) {
+        return new PlayerSession(
+                0,
+                player.getName(),
+                player.getUniqueId().toString(),
+                playerJoins.get(player.getUniqueId()),
+                getTime(),
+                player.getConnection().getAddress().getAddress().getHostAddress()
+        );
     }
 }

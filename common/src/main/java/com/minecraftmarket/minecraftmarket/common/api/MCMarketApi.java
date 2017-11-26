@@ -2,6 +2,7 @@ package com.minecraftmarket.minecraftmarket.common.api;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.minecraftmarket.minecraftmarket.common.api.models.*;
 
 import java.io.BufferedReader;
@@ -15,8 +16,8 @@ import java.util.Iterator;
 import java.util.List;
 
 public class MCMarketApi {
-    private final String BASE_URL = "https://www.minecraftmarket.com/api/v1/plugin/";
-    private final ObjectMapper MAPPER = new ObjectMapper();
+    private final String BASE_URL = "http://minecraftmarket.local/api/v1/plugin/";
+    private final ObjectMapper MAPPER = new ObjectMapper().registerModule(new Jdk8Module());
     private final String API_KEY;
     private final String USER_AGENT;
     private final boolean DEBUG;
@@ -479,9 +480,9 @@ public class MCMarketApi {
         return true;
     }
 
-    public long getEventsCount() {
+    public long getServerInformationCount() {
         try {
-            BufferedReader reader = makeRequest("/events", "GET", "");
+            BufferedReader reader = makeRequest("/serverinformation", "GET", "");
             JsonNode response = MAPPER.readTree(reader);
             return response.get("count").asLong();
         } catch (Exception e) {
@@ -492,14 +493,14 @@ public class MCMarketApi {
         return 0;
     }
 
-    public List<Event> getEvents() {
-        return getEvents(1, 0);
+    public List<ServerInfo> getServerInformation() {
+        return getServerInformation(1, 0);
     }
 
-    public List<Event> getEvents(int startPage, int maxPages) {
-        List<Event> events = new ArrayList<>();
+    public List<ServerInfo> getServerInformation(int startPage, int maxPages) {
+        List<ServerInfo> serverInformation = new ArrayList<>();
         try {
-            BufferedReader reader = makeRequest("/events", "GET", "&limit=25");
+            BufferedReader reader = makeRequest("/serverinformation", "GET", "&limit=25");
             JsonNode response = MAPPER.readTree(reader);
             long count = response.get("count").asLong();
             long pages = (count / 25) + 1;
@@ -514,14 +515,14 @@ public class MCMarketApi {
 
             for (int i = startPage; i <= pages; i++) {
                 if (i > 1) {
-                    reader = makeRequest("/events", "GET", "&limit=25&offset=" + (25 * (i - 1)));
+                    reader = makeRequest("/serverinformation", "GET", "&limit=25&offset=" + (25 * (i - 1)));
                     response = MAPPER.readTree(reader);
                 }
 
                 Iterator<JsonNode> results = response.get("results").elements();
                 while (results.hasNext()) {
                     JsonNode result = results.next();
-                    events.add(MAPPER.readValue(result.toString(), Event.class));
+                    serverInformation.add(MAPPER.readValue(result.toString(), ServerInfo.class));
                 }
             }
         } catch (Exception e) {
@@ -529,13 +530,13 @@ public class MCMarketApi {
                 e.printStackTrace();
             }
         }
-        return events;
+        return serverInformation;
     }
 
-    public Event getEvent(long eventID) {
+    public ServerInfo getServerInformation(long serverInfoID) {
         try {
-            BufferedReader reader = makeRequest(String.format("/events/%s", eventID), "GET", "");
-            return MAPPER.readValue(reader, Event.class);
+            BufferedReader reader = makeRequest(String.format("/serverinformation/%s", serverInfoID), "GET", "");
+            return MAPPER.readValue(reader, ServerInfo.class);
         } catch (Exception e) {
             if (DEBUG) {
                 e.printStackTrace();
@@ -544,9 +545,86 @@ public class MCMarketApi {
         return null;
     }
 
-    public boolean sendEvents(List<Event> events) {
+    public boolean sendServerInformation(List<ServerInfo> serverInformation) {
         try {
-            makeRequest("/events", "POST", MAPPER.writeValueAsString(events));
+            makeRequest("/serverinformation", "POST", MAPPER.writeValueAsString(serverInformation));
+        } catch (IOException e) {
+            if (DEBUG) {
+                e.printStackTrace();
+            }
+            return false;
+        }
+        return true;
+    }
+
+    public long getPlayerSessionsCount() {
+        try {
+            BufferedReader reader = makeRequest("/playersessions", "GET", "");
+            JsonNode response = MAPPER.readTree(reader);
+            return response.get("count").asLong();
+        } catch (Exception e) {
+            if (DEBUG) {
+                e.printStackTrace();
+            }
+        }
+        return 0;
+    }
+
+    public List<PlayerSession> getPlayerSessions() {
+        return getPlayerSessions(1, 0);
+    }
+
+    public List<PlayerSession> getPlayerSessions(int startPage, int maxPages) {
+        List<PlayerSession> playerSessions = new ArrayList<>();
+        try {
+            BufferedReader reader = makeRequest("/playersessions", "GET", "&limit=25");
+            JsonNode response = MAPPER.readTree(reader);
+            long count = response.get("count").asLong();
+            long pages = (count / 25) + 1;
+
+            if (startPage <= pages) {
+                pages = pages - (startPage - 1);
+            } else throw new IndexOutOfBoundsException("startPage exceeds the total amount of pages.");
+
+            if (maxPages > 0 && pages > maxPages) {
+                pages = maxPages;
+            }
+
+            for (int i = startPage; i <= pages; i++) {
+                if (i > 1) {
+                    reader = makeRequest("/playersessions", "GET", "&limit=25&offset=" + (25 * (i - 1)));
+                    response = MAPPER.readTree(reader);
+                }
+
+                Iterator<JsonNode> results = response.get("results").elements();
+                while (results.hasNext()) {
+                    JsonNode result = results.next();
+                    playerSessions.add(MAPPER.readValue(result.toString(), PlayerSession.class));
+                }
+            }
+        } catch (Exception e) {
+            if (DEBUG) {
+                e.printStackTrace();
+            }
+        }
+        return playerSessions;
+    }
+
+    public PlayerSession getPlayerSession(long sessionID) {
+        try {
+            BufferedReader reader = makeRequest(String.format("/playersessions/%s", sessionID), "GET", "");
+            return MAPPER.readValue(reader, PlayerSession.class);
+        } catch (Exception e) {
+            if (DEBUG) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+
+    public boolean sendPlayerSessions(List<PlayerSession> playerSessions) {
+        try {
+            makeRequest("/playersessions", "POST", MAPPER.writeValueAsString(playerSessions));
         } catch (IOException e) {
             if (DEBUG) {
                 e.printStackTrace();
