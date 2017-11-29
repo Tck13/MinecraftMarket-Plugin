@@ -132,7 +132,7 @@ public class SpongeStats extends MCMarketStats {
                     plugin.getVersion().orElse("Unknown"),
                     plugin.getDescription().orElse("Unknown"),
                     String.join(", ", plugin.getAuthors()),
-                    Optional.of(plugin.getUrl().orElse("Unknown"))
+                    Optional.ofNullable(plugin.getUrl().orElse(null))
             ));
         }
         return plugins;

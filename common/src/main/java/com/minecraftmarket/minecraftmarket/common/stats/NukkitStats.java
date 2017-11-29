@@ -120,7 +120,7 @@ public class NukkitStats extends MCMarketStats {
                     plugin.getDescription().getVersion(),
                     plugin.getDescription().getDescription(),
                     String.join(", ", plugin.getDescription().getAuthors()),
-                    Optional.of(plugin.getDescription().getWebsite())
+                    Optional.ofNullable(plugin.getDescription().getWebsite())
             ));
         }
         return plugins;
