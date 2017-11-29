@@ -36,7 +36,7 @@ import java.util.Optional;
 @Plugin(
         id = "minecraftmarket",
         name = "MinecraftMarket",
-        version = "3.6.2",
+        version = "3.6.3",
         description = "The #1 webstore platform for Minecraft servers",
         authors = "R4G3_BABY",
         url = "https://www.minecraftmarket.com"

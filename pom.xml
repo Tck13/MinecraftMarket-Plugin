@@ -6,7 +6,7 @@
 
     <groupId>com.minecraftmarket</groupId>
     <artifactId>MinecraftMarket</artifactId>
-    <version>3.6.2</version>
+    <version>3.6.3</version>
     <modules>
         <module>common</module>
         <module>bukkit</module>
