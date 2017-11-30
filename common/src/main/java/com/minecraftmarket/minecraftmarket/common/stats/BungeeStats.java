@@ -77,6 +77,7 @@ public class BungeeStats extends MCMarketStats {
         List<ServerPlayer> players = new ArrayList<>();
         for (ProxiedPlayer player : plugin.getProxy().getPlayers()) {
             players.add(new ServerPlayer(
+                    0,
                     player.getName(),
                     player.getUniqueId().toString(),
                     player.getAddress().getAddress().getHostAddress(),
@@ -92,7 +93,8 @@ public class BungeeStats extends MCMarketStats {
                     Optional.empty(),
                     Optional.empty(),
                     Optional.empty(),
-                    Optional.of(player.getServer() != null ? player.getServer().getInfo().getName() : "Unknown")
+                    Optional.of(player.getServer() != null ? player.getServer().getInfo().getName() : "Unknown"),
+                    Optional.empty()
             ));
         }
         return players;
@@ -110,10 +112,11 @@ public class BungeeStats extends MCMarketStats {
             }
 
             plugins.add(new ServerPlugin(
+                    0,
                     plugin.getDescription().getName(),
                     version,
-                    plugin.getDescription().getDescription(),
-                    plugin.getDescription().getAuthor(),
+                    Optional.ofNullable(plugin.getDescription().getDescription()),
+                    Optional.ofNullable(plugin.getDescription().getAuthor()),
                     Optional.empty()
             ));
         }

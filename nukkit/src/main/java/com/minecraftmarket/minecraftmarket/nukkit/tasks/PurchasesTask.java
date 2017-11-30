@@ -48,7 +48,7 @@ public class PurchasesTask extends AsyncTask {
             return;
         }
 
-        if (command.getRequiredSlots() > 0 && player != null) {
+        if (command.getRequiredSlots() > 0 && (player != null && player.isOnline())) {
             if (getEmptySlots(player.getInventory()) < command.getRequiredSlots()) {
                 return;
             }

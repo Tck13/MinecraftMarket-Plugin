@@ -10,23 +10,30 @@ import java.util.Optional;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class ServerPlugin {
+    private final long id;
     private final String name;
     private final String version;
-    private final String description;
-    private final String authors;
+    private final Optional<String> description;
+    private final Optional<String> authors;
     private final Optional<String> website;
 
     @JsonCreator
-    public ServerPlugin(@JsonProperty("name") String name,
+    public ServerPlugin(@JsonProperty("id") long id,
+                        @JsonProperty("name") String name,
                         @JsonProperty("version") String version,
-                        @JsonProperty("description") String description,
-                        @JsonProperty("authors") String authors,
+                        @JsonProperty("description") Optional<String> description,
+                        @JsonProperty("authors") Optional<String> authors,
                         @JsonProperty("website") Optional<String> website) {
+        this.id = id;
         this.name = name;
         this.version = version;
         this.description = description;
         this.authors = authors;
         this.website = website;
+    }
+
+    public long getId() {
+        return id;
     }
 
     public String getName() {
@@ -37,11 +44,11 @@ public class ServerPlugin {
         return version;
     }
 
-    public String getDescription() {
+    public Optional<String> getDescription() {
         return description;
     }
 
-    public String getAuthors() {
+    public Optional<String> getAuthors() {
         return authors;
     }
 
@@ -51,7 +58,8 @@ public class ServerPlugin {
 
     @Override
     public String toString() {
-        return "Name='" + getName() + "' " +
+        return "ID='" + getId() + "' " +
+                "Name='" + getName() + "' " +
                 "Version='" + getVersion() + "' " +
                 "Description='" + getDescription() + "' " +
                 "Authors='" + getAuthors() + "' " +

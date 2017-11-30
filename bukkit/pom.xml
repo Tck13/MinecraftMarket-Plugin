@@ -7,7 +7,7 @@
     <parent>
         <artifactId>MinecraftMarket</artifactId>
         <groupId>com.minecraftmarket</groupId>
-        <version>3.6.3</version>
+        <version>3.6.4</version>
     </parent>
 
     <artifactId>bukkit</artifactId>

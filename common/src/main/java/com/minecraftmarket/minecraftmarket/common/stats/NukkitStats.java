@@ -91,6 +91,7 @@ public class NukkitStats extends MCMarketStats {
         List<ServerPlayer> players = new ArrayList<>();
         for (Player player : plugin.getServer().getOnlinePlayers().values()) {
             players.add(new ServerPlayer(
+                    0,
                     player.getName(),
                     player.getUniqueId().toString(),
                     player.getAddress(),
@@ -101,11 +102,12 @@ public class NukkitStats extends MCMarketStats {
                     Optional.of((long) player.getLocation().getFloorY()),
                     Optional.of((long) player.getLocation().getFloorZ()),
                     Optional.of(Server.getGamemodeString(player.getGamemode(), true)),
-                    Optional.of((double) player.getHealth()),
-                    Optional.of((double) player.getMaxHealth()),
+                    Optional.of(round(player.getHealth())),
+                    Optional.of(round(player.getMaxHealth())),
                     Optional.of((long) player.getExperienceLevel()),
-                    Optional.of((float) player.getExperience()),
+                    Optional.of(round(player.getExperience())),
                     Optional.of((long) player.getFoodData().getLevel()),
+                    Optional.empty(),
                     Optional.empty()
             ));
         }
@@ -116,11 +118,12 @@ public class NukkitStats extends MCMarketStats {
         List<ServerPlugin> plugins = new ArrayList<>();
         for (Plugin plugin : plugin.getServer().getPluginManager().getPlugins().values()) {
             plugins.add(new ServerPlugin(
+                    0,
                     plugin.getName(),
                     plugin.getDescription().getVersion(),
-                    plugin.getDescription().getDescription(),
-                    String.join(", ", plugin.getDescription().getAuthors()),
-                    Optional.of(plugin.getDescription().getWebsite())
+                    Optional.ofNullable(plugin.getDescription().getDescription()),
+                    Optional.ofNullable(String.join(", ", plugin.getDescription().getAuthors())),
+                    Optional.ofNullable(plugin.getDescription().getWebsite())
             ));
         }
         return plugins;

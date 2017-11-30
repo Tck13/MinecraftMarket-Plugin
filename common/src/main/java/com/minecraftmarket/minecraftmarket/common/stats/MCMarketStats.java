@@ -39,9 +39,13 @@ abstract class MCMarketStats {
         stats.put("totalMemory", Runtime.getRuntime().totalMemory());
         stats.put("freeMemory", Runtime.getRuntime().freeMemory());
         stats.put("cores", Long.parseLong(String.valueOf(Runtime.getRuntime().availableProcessors()))); // Is this really necessary?
-        stats.put("cpuUsage", Math.min(Math.round(cpuUsage * 100.0) / 100.0, 100.0));
+        stats.put("cpuUsage", Math.min(round(cpuUsage), 100.0));
 
         return stats;
+    }
+
+    double round(double value) {
+        return Math.round(value * 100.0) / 100.0;
     }
 
     private final List<ServerInfo> serverInfo = new ArrayList<>();
