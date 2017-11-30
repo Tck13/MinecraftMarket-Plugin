@@ -46,7 +46,7 @@ public class PurchasesTask implements Runnable {
     private void runCommand(Command command) {
         if (Sponge.isServerAvailable()) {
             Optional<Player> player = Sponge.getServer().getPlayer(command.getPlayer().getName());
-            if (command.isRequiredOnline() && player.isPresent()) {
+            if (command.isRequiredOnline() && !player.isPresent()) {
                 return;
             }
 

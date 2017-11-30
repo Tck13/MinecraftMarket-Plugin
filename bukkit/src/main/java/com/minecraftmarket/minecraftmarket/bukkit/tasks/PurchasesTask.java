@@ -48,7 +48,7 @@ public class PurchasesTask implements Runnable {
             return;
         }
 
-        if (command.getRequiredSlots() > 0 && player != null) {
+        if (command.getRequiredSlots() > 0 && (player != null && player.isOnline())) {
             if (getEmptySlots(player.getInventory()) < command.getRequiredSlots()) {
                 return;
             }
