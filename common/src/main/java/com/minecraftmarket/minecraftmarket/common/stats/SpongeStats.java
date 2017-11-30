@@ -94,13 +94,13 @@ public class SpongeStats extends MCMarketStats {
         for (Player player : Sponge.getServer().getOnlinePlayers()) {
             Optional<ExperienceHolderData> experienceData = player.get(ExperienceHolderData.class);
             Optional<Long> level;
-            Optional<Float> exp;
+            int exp;
             if (experienceData.isPresent()) {
                 level = Optional.of((long) experienceData.get().level().get());
-                exp = Optional.of((float) experienceData.get().totalExperience().get());
+                exp = experienceData.get().totalExperience().get();
             } else {
                 level = Optional.empty();
-                exp = Optional.empty();
+                exp = 0;
             }
             players.add(new ServerPlayer(
                     player.getName(),
@@ -113,10 +113,10 @@ public class SpongeStats extends MCMarketStats {
                     Optional.of((long) player.getLocation().getBlockY()),
                     Optional.of((long) player.getLocation().getBlockZ()),
                     Optional.of(player.gameMode().get().getName()),
-                    Optional.of(player.health().get()),
-                    Optional.of(player.maxHealth().get()),
+                    Optional.of(round(player.health().get())),
+                    Optional.of(round(player.maxHealth().get())),
                     level,
-                    exp,
+                    Optional.of(round(exp)),
                     Optional.of((long) player.foodLevel().get()),
                     Optional.empty()
             ));

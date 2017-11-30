@@ -101,10 +101,10 @@ public class NukkitStats extends MCMarketStats {
                     Optional.of((long) player.getLocation().getFloorY()),
                     Optional.of((long) player.getLocation().getFloorZ()),
                     Optional.of(Server.getGamemodeString(player.getGamemode(), true)),
-                    Optional.of((double) player.getHealth()),
-                    Optional.of((double) player.getMaxHealth()),
+                    Optional.of(round(player.getHealth())),
+                    Optional.of(round(player.getMaxHealth())),
                     Optional.of((long) player.getExperienceLevel()),
-                    Optional.of((float) player.getExperience()),
+                    Optional.of(round(player.getExperience())),
                     Optional.of((long) player.getFoodData().getLevel()),
                     Optional.empty()
             ));

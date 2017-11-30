@@ -23,7 +23,7 @@ public class ServerPlayer {
     private final Optional<Double> health;
     private final Optional<Double> max_health;
     private final Optional<Long> level;
-    private final Optional<Float> exp;
+    private final Optional<Double> exp;
     private final Optional<Long> food;
     private final Optional<String> server;
 
@@ -41,7 +41,7 @@ public class ServerPlayer {
                         @JsonProperty("health") Optional<Double> health,
                         @JsonProperty("max_health") Optional<Double> max_health,
                         @JsonProperty("level") Optional<Long> level,
-                        @JsonProperty("exp") Optional<Float> exp,
+                        @JsonProperty("exp") Optional<Double> exp,
                         @JsonProperty("food") Optional<Long> food,
                         @JsonProperty("server") Optional<String> server) {
         this.username = username;
@@ -114,7 +114,7 @@ public class ServerPlayer {
         return level;
     }
 
-    public Optional<Float> getExp() {
+    public Optional<Double> getExp() {
         return exp;
     }
 

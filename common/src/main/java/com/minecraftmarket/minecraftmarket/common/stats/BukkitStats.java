@@ -104,10 +104,10 @@ public class BukkitStats extends MCMarketStats {
                     Optional.of((long) player.getLocation().getBlockY()),
                     Optional.of((long) player.getLocation().getBlockZ()),
                     Optional.of(player.getGameMode().name()),
-                    Optional.of(player.getHealth()),
-                    Optional.of(player.getMaxHealth()),
+                    Optional.of(round(player.getHealth())),
+                    Optional.of(round(player.getMaxHealth())),
                     Optional.of((long) player.getLevel()),
-                    Optional.of(player.getExp()),
+                    Optional.of(round(player.getExp())),
                     Optional.of((long) player.getFoodLevel()),
                     Optional.empty()
             ));
