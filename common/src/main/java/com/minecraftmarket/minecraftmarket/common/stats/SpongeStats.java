@@ -103,6 +103,7 @@ public class SpongeStats extends MCMarketStats {
                 exp = 0;
             }
             players.add(new ServerPlayer(
+                    0,
                     player.getName(),
                     player.getUniqueId().toString(),
                     player.getConnection().getAddress().getAddress().getHostAddress(),
@@ -118,6 +119,7 @@ public class SpongeStats extends MCMarketStats {
                     level,
                     Optional.of(round(exp)),
                     Optional.of((long) player.foodLevel().get()),
+                    Optional.empty(),
                     Optional.empty()
             ));
         }
@@ -128,10 +130,11 @@ public class SpongeStats extends MCMarketStats {
         List<ServerPlugin> plugins = new ArrayList<>();
         for (PluginContainer plugin : Sponge.getPluginManager().getPlugins()) {
             plugins.add(new ServerPlugin(
+                    0,
                     plugin.getName(),
                     plugin.getVersion().orElse("Unknown"),
-                    plugin.getDescription().orElse("Unknown"),
-                    String.join(", ", plugin.getAuthors()),
+                    Optional.ofNullable(plugin.getDescription().orElse(null)),
+                    Optional.ofNullable(String.join(", ", plugin.getAuthors())),
                     Optional.ofNullable(plugin.getUrl().orElse(null))
             ));
         }

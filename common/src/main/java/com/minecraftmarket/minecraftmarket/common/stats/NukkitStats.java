@@ -91,6 +91,7 @@ public class NukkitStats extends MCMarketStats {
         List<ServerPlayer> players = new ArrayList<>();
         for (Player player : plugin.getServer().getOnlinePlayers().values()) {
             players.add(new ServerPlayer(
+                    0,
                     player.getName(),
                     player.getUniqueId().toString(),
                     player.getAddress(),
@@ -106,6 +107,7 @@ public class NukkitStats extends MCMarketStats {
                     Optional.of((long) player.getExperienceLevel()),
                     Optional.of(round(player.getExperience())),
                     Optional.of((long) player.getFoodData().getLevel()),
+                    Optional.empty(),
                     Optional.empty()
             ));
         }
@@ -116,10 +118,11 @@ public class NukkitStats extends MCMarketStats {
         List<ServerPlugin> plugins = new ArrayList<>();
         for (Plugin plugin : plugin.getServer().getPluginManager().getPlugins().values()) {
             plugins.add(new ServerPlugin(
+                    0,
                     plugin.getName(),
                     plugin.getDescription().getVersion(),
-                    plugin.getDescription().getDescription(),
-                    String.join(", ", plugin.getDescription().getAuthors()),
+                    Optional.ofNullable(plugin.getDescription().getDescription()),
+                    Optional.ofNullable(String.join(", ", plugin.getDescription().getAuthors())),
                     Optional.ofNullable(plugin.getDescription().getWebsite())
             ));
         }

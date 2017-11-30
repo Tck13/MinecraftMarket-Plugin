@@ -10,6 +10,7 @@ import java.util.Optional;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class ServerPlayer {
+    private final long id;
     private final String username;
     private final String uuid;
     private final String ip;
@@ -26,9 +27,11 @@ public class ServerPlayer {
     private final Optional<Double> exp;
     private final Optional<Long> food;
     private final Optional<String> server;
+    private final Optional<String> ip_country;
 
     @JsonCreator
-    public ServerPlayer(@JsonProperty("username") String username,
+    public ServerPlayer(@JsonProperty("id") long id,
+                        @JsonProperty("username") String username,
                         @JsonProperty("uuid") String uuid,
                         @JsonProperty("ip") String ip,
                         @JsonProperty("ping") long ping,
@@ -43,7 +46,9 @@ public class ServerPlayer {
                         @JsonProperty("level") Optional<Long> level,
                         @JsonProperty("exp") Optional<Double> exp,
                         @JsonProperty("food") Optional<Long> food,
-                        @JsonProperty("server") Optional<String> server) {
+                        @JsonProperty("server") Optional<String> server,
+                        @JsonProperty("ip_country") Optional<String> ip_country) {
+        this.id = id;
         this.username = username;
         this.uuid = uuid;
         this.ip = ip;
@@ -60,6 +65,11 @@ public class ServerPlayer {
         this.exp = exp;
         this.food = food;
         this.server = server;
+        this.ip_country = ip_country;
+    }
+
+    public long getId() {
+        return id;
     }
 
     public String getUsername() {
@@ -126,9 +136,14 @@ public class ServerPlayer {
         return server;
     }
 
+    public Optional<String> getIp_country() {
+        return ip_country;
+    }
+
     @Override
     public String toString() {
-        return "Username='" + getUsername() + "' " +
+        return "ID='" + getId() + "' " +
+                "Username='" + getUsername() + "' " +
                 "Uuid='" + getUuid() + "' " +
                 "Ip='" + getIp() + "' " +
                 "Ping='" + getPing() + "' " +
@@ -143,6 +158,7 @@ public class ServerPlayer {
                 "Level='" + getLevel() + "' " +
                 "Exp='" + getExp() + "' " +
                 "Food='" + getFood() + "' " +
-                "Server='" + getServer() + "'";
+                "Server='" + getServer() + "' " +
+                "IpCoutry='" + getIp_country() + "'";
     }
 }
