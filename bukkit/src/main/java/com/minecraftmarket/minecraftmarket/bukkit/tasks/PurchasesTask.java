@@ -79,7 +79,7 @@ public class PurchasesTask implements Runnable {
 
     private int getEmptySlots(PlayerInventory inventory) {
         int amount = 0;
-        for (ItemStack stack : inventory.getContents()) {
+        for (ItemStack stack : inventory.getStorageContents()) {
             if (stack == null || stack.getType() == Material.AIR) {
                 amount++;
             }
