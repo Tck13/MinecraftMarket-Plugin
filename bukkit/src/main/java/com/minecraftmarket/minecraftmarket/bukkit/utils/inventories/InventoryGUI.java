@@ -18,7 +18,7 @@ import java.util.Map;
 public class InventoryGUI {
     private static final Map<Inventory, InventoryGUI> inventories = new HashMap<>();
     private final Map<Integer, ItemClick> items = new HashMap<>();
-    private Inventory inventory;
+    private final Inventory inventory;
     private boolean cancelClick;
     private boolean listed;
 
@@ -30,7 +30,7 @@ public class InventoryGUI {
         if (size < 9) {
             size = 9;
         }
-        this.inventory = Bukkit.createInventory(null, size, Colors.color(name));
+        this.inventory = Bukkit.createInventory(null, size, Colors.color(name.length() > 32 ? name.substring(0, 32) : name));
         this.cancelClick = cancelClick;
         this.listed = false;
     }
