@@ -19,7 +19,7 @@ public class InventoryGUI {
     private static final Map<Inventory, InventoryGUI> inventories = new HashMap<>();
     private final Map<Integer, ItemClick> items = new HashMap<>();
     private final Inventory inventory;
-    private boolean cancelClick;
+    private final boolean cancelClick;
     private boolean listed;
 
     public InventoryGUI(String name, int size) {
