@@ -34,6 +34,7 @@ public class InventoryManager {
 	private ItemStack previousPageItem;
 	private ItemStack nextPageItem;
 	private Market market;
+	private List<String> exist;
 	
     public HashMap<UUID, Block> buySignSetup = new HashMap<>();
 
@@ -72,6 +73,7 @@ public class InventoryManager {
 	}
 
 	public void load() {
+		exist = new ArrayList<>();
 		plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
 			GUILayoutConfig guiLayoutConfig = plugin.getGUILayoutConfig();
 
@@ -136,19 +138,7 @@ public class InventoryManager {
 						mainInventories.remove(i);
 					}
 				}
-
-				List<String> exist = new ArrayList<>();
-				for (int i = 0; i < categories.size(); i++) {
-					Category category = categories.get(i);
-					int s = Math.max(plugin.getGUILayoutConfig().getGuiRows() * 9, 9);
-					int totalSlots = category.getSubCategories().size() > 0 ? Utils.roundUp(category.getSubCategories().size(), 9) + category.getItems().size() : category.getItems().size();
-					int in = Math.max(Utils.roundUp(totalSlots, s) / s, 1);
-
-					for (int a = 1; a <= in; a++) {
-						exist.add(category.getId() + "|" + a);
-					}
-				}
-
+				
 				List<String> toRemove = new ArrayList<>(inventories.keySet());
 				toRemove.removeAll(exist);
 				for (int i = 0; i < toRemove.size(); i++) {
@@ -222,7 +212,8 @@ public class InventoryManager {
 		if (invs > 0) {
 			for (int i = 1; i <= invs; i++) {
 				InventoryGUI inventory = inventories.get(category.getId() + "|" + i) != null ? inventories.get(category.getId() + "|" + i) : new InventoryGUI(replaceVars(guiLayoutConfig.getItemListTile(), category, null), size + 9, true);
-
+				exist.add(category.getId() + "|" + i);
+				
 				for (int pos = (size * i) - size; pos < totalSlots && pos < size * i; pos++) {
 					if (category.getSubCategories().size() > 0 && pos < Utils.roundUp(category.getSubCategories().size(), 9)) {
 						if (pos < category.getSubCategories().size()) {
@@ -310,6 +301,7 @@ public class InventoryManager {
 			}
 		} else {
 			InventoryGUI inventory = inventories.get(category.getId() + "|1") != null ? inventories.get(category.getId() + "|1") : new InventoryGUI(replaceVars(guiLayoutConfig.getItemListTile(), category, null), size + 9, true);
+			exist.add(category.getId() + "|1");
 			
 			for(int b = totalSlots; b < size; b++){
 				inventory.setItem(b, null);
