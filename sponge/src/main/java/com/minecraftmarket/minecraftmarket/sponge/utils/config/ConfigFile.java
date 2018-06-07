@@ -1,11 +1,11 @@
 package com.minecraftmarket.minecraftmarket.sponge.utils.config;
 
-import ninja.leaping.configurate.ConfigurationNode;
-import ninja.leaping.configurate.yaml.YAMLConfigurationLoader;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+
+import ninja.leaping.configurate.ConfigurationNode;
+import ninja.leaping.configurate.yaml.YAMLConfigurationLoader;
 
 public abstract class ConfigFile extends File {
     private final YAMLConfigurationLoader loader;

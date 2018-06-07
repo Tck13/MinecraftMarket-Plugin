@@ -1,18 +1,19 @@
 package com.minecraftmarket.minecraftmarket.sponge.tasks;
 
-import com.minecraftmarket.minecraftmarket.common.api.MCMarketApi;
-import com.minecraftmarket.minecraftmarket.common.api.models.Command;
-import com.minecraftmarket.minecraftmarket.sponge.MCMarket;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Consumer;
+
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.type.CarriedInventory;
 import org.spongepowered.api.scheduler.Task;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Consumer;
+import com.minecraftmarket.minecraftmarket.common.api.MCMarketApi;
+import com.minecraftmarket.minecraftmarket.common.api.models.Command;
+import com.minecraftmarket.minecraftmarket.sponge.MCMarket;
 
 public class PurchasesTask implements Runnable {
     private final MCMarket plugin;

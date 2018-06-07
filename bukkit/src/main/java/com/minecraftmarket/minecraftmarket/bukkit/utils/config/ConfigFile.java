@@ -1,11 +1,11 @@
 package com.minecraftmarket.minecraftmarket.bukkit.utils.config;
 
+import java.io.File;
+import java.io.IOException;
+
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.io.File;
-import java.io.IOException;
 
 public abstract class ConfigFile extends File {
     protected final FileConfiguration config;

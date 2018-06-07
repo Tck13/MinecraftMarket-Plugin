@@ -1,10 +1,11 @@
 package com.minecraftmarket.minecraftmarket.nukkit.configs;
 
-import cn.nukkit.plugin.PluginBase;
+import java.util.List;
+
 import com.minecraftmarket.minecraftmarket.nukkit.utils.chat.Colors;
 import com.minecraftmarket.minecraftmarket.nukkit.utils.config.ConfigFile;
 
-import java.util.List;
+import cn.nukkit.plugin.PluginBase;
 
 public class SignsLayoutConfig extends ConfigFile {
     private final List<String> activeLayout;

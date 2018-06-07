@@ -1,16 +1,22 @@
 package com.minecraftmarket.minecraftmarket.bukkit.commands;
 
-import com.minecraftmarket.minecraftmarket.bukkit.MCMarket;
-import com.minecraftmarket.minecraftmarket.bukkit.commands.subcmds.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import com.minecraftmarket.minecraftmarket.bukkit.MCMarket;
+import com.minecraftmarket.minecraftmarket.bukkit.commands.subcmds.ApiKey;
+import com.minecraftmarket.minecraftmarket.bukkit.commands.subcmds.Check;
+import com.minecraftmarket.minecraftmarket.bukkit.commands.subcmds.Cmd;
+import com.minecraftmarket.minecraftmarket.bukkit.commands.subcmds.Reload;
+import com.minecraftmarket.minecraftmarket.bukkit.commands.subcmds.UpdateSigns;
+import com.minecraftmarket.minecraftmarket.bukkit.commands.subcmds.Version;
 
 public class MMCmd implements CommandExecutor, TabCompleter {
     private final List<Cmd> subCmds = new ArrayList<>();

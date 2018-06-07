@@ -1,10 +1,11 @@
 package com.minecraftmarket.minecraftmarket.bukkit.configs;
 
-import com.minecraftmarket.minecraftmarket.bukkit.utils.chat.Colors;
-import com.minecraftmarket.minecraftmarket.bukkit.utils.config.ConfigFile;
+import java.util.List;
+
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.List;
+import com.minecraftmarket.minecraftmarket.bukkit.utils.chat.Colors;
+import com.minecraftmarket.minecraftmarket.bukkit.utils.config.ConfigFile;
 
 public class GUILayoutConfig extends ConfigFile {
     private final int guiRows;

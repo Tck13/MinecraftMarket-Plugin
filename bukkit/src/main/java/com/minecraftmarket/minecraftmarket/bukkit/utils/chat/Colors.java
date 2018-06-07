@@ -1,9 +1,9 @@
 package com.minecraftmarket.minecraftmarket.bukkit.utils.chat;
 
-import org.bukkit.ChatColor;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import org.bukkit.ChatColor;
 
 public class Colors {
     public static String color(String msg) {

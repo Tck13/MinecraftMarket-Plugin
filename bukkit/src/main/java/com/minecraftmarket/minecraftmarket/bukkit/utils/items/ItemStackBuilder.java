@@ -1,14 +1,15 @@
 package com.minecraftmarket.minecraftmarket.bukkit.utils.items;
 
-import com.minecraftmarket.minecraftmarket.bukkit.utils.chat.Colors;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.minecraftmarket.minecraftmarket.bukkit.utils.chat.Colors;
 
 public class ItemStackBuilder {
     private final ItemStack itemStack;

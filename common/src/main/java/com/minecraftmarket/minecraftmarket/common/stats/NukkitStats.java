@@ -1,5 +1,18 @@
 package com.minecraftmarket.minecraftmarket.common.stats;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Timer;
+import java.util.TimerTask;
+
+import com.minecraftmarket.minecraftmarket.common.api.MCMarketApi;
+import com.minecraftmarket.minecraftmarket.common.api.models.PlayerSession;
+import com.minecraftmarket.minecraftmarket.common.api.models.ServerInfo;
+import com.minecraftmarket.minecraftmarket.common.api.models.ServerPlayer;
+import com.minecraftmarket.minecraftmarket.common.api.models.ServerPlugin;
+
 import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.event.EventHandler;
@@ -7,18 +20,6 @@ import cn.nukkit.event.Listener;
 import cn.nukkit.event.player.PlayerJoinEvent;
 import cn.nukkit.event.player.PlayerQuitEvent;
 import cn.nukkit.plugin.Plugin;
-import com.minecraftmarket.minecraftmarket.common.api.MCMarketApi;
-import com.minecraftmarket.minecraftmarket.common.api.models.PlayerSession;
-import com.minecraftmarket.minecraftmarket.common.api.models.ServerInfo;
-import com.minecraftmarket.minecraftmarket.common.api.models.ServerPlayer;
-import com.minecraftmarket.minecraftmarket.common.api.models.ServerPlugin;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class NukkitStats extends MCMarketStats {
     private final Plugin plugin;

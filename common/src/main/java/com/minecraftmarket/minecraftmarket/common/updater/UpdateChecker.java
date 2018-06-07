@@ -1,14 +1,14 @@
 package com.minecraftmarket.minecraftmarket.common.updater;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.minecraftmarket.minecraftmarket.common.utils.Utils;
-
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Iterator;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.minecraftmarket.minecraftmarket.common.utils.Utils;
 
 public class UpdateChecker {
     private final String VERSION_URL = "https://api.spiget.org/v2/resources/%s/versions?sort=-name";

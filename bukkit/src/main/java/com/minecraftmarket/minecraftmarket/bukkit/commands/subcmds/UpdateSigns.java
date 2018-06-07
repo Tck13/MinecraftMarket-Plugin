@@ -1,9 +1,12 @@
 package com.minecraftmarket.minecraftmarket.bukkit.commands.subcmds;
 
+import java.util.concurrent.CompletableFuture;
+
+import org.bukkit.command.CommandSender;
+
 import com.minecraftmarket.minecraftmarket.bukkit.MCMarket;
 import com.minecraftmarket.minecraftmarket.bukkit.utils.chat.Colors;
 import com.minecraftmarket.minecraftmarket.common.i18n.I18n;
-import org.bukkit.command.CommandSender;
 
 public class UpdateSigns extends Cmd {
     private final MCMarket plugin;
@@ -18,7 +21,9 @@ public class UpdateSigns extends Cmd {
         if (plugin.getMainConfig().isUseSigns()) {
             if (MCMarket.isAuthenticated()) {
                 sender.sendMessage(Colors.color(I18n.tl("prefix") + " " + I18n.tl("cmd_sign_update")));
-                plugin.getSignsTask().updateSigns();
+                CompletableFuture.runAsync(() -> plugin.getSignsTask().updateSigns()).thenRun(() -> {
+                    sender.sendMessage(Colors.color(I18n.tl("prefix") + " " + I18n.tl("cmd_sign_update_done")));
+                });
             } else {
                 sender.sendMessage(Colors.color(I18n.tl("prefix") + " " + I18n.tl("cmd_auth_key")));
             }

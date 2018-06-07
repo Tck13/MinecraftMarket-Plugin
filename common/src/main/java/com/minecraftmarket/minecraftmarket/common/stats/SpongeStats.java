@@ -1,17 +1,5 @@
 package com.minecraftmarket.minecraftmarket.common.stats;
 
-import com.minecraftmarket.minecraftmarket.common.api.MCMarketApi;
-import com.minecraftmarket.minecraftmarket.common.api.models.PlayerSession;
-import com.minecraftmarket.minecraftmarket.common.api.models.ServerInfo;
-import com.minecraftmarket.minecraftmarket.common.api.models.ServerPlayer;
-import com.minecraftmarket.minecraftmarket.common.api.models.ServerPlugin;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.data.manipulator.mutable.entity.ExperienceHolderData;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.network.ClientConnectionEvent;
-import org.spongepowered.api.plugin.PluginContainer;
-
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +7,19 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.data.manipulator.mutable.entity.ExperienceHolderData;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.network.ClientConnectionEvent;
+import org.spongepowered.api.plugin.PluginContainer;
+
+import com.minecraftmarket.minecraftmarket.common.api.MCMarketApi;
+import com.minecraftmarket.minecraftmarket.common.api.models.PlayerSession;
+import com.minecraftmarket.minecraftmarket.common.api.models.ServerInfo;
+import com.minecraftmarket.minecraftmarket.common.api.models.ServerPlayer;
+import com.minecraftmarket.minecraftmarket.common.api.models.ServerPlugin;
 
 public class SpongeStats extends MCMarketStats {
 

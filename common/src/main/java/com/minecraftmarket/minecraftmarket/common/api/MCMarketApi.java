@@ -1,10 +1,5 @@
 package com.minecraftmarket.minecraftmarket.common.api;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.minecraftmarket.minecraftmarket.common.api.models.*;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -14,6 +9,20 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.minecraftmarket.minecraftmarket.common.api.models.Category;
+import com.minecraftmarket.minecraftmarket.common.api.models.Command;
+import com.minecraftmarket.minecraftmarket.common.api.models.Currency;
+import com.minecraftmarket.minecraftmarket.common.api.models.Item;
+import com.minecraftmarket.minecraftmarket.common.api.models.MMPlayer;
+import com.minecraftmarket.minecraftmarket.common.api.models.Market;
+import com.minecraftmarket.minecraftmarket.common.api.models.PlayerSession;
+import com.minecraftmarket.minecraftmarket.common.api.models.Purchase;
+import com.minecraftmarket.minecraftmarket.common.api.models.ServerInfo;
+import com.minecraftmarket.minecraftmarket.common.api.models.Transaction;
 
 public class MCMarketApi {
     private final String BASE_URL = "https://www.minecraftmarket.com/api/v1/plugin/";

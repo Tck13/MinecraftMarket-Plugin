@@ -11,3 +11,15 @@ Waiting:
 - ""
 - ""
 - ""
+
+Broken:
+- "&cItem"
+- "&cno longer"
+- "&cexist"
+- ""
+
+Buy:
+- ""
+- "&6BUY NOW"
+- "&f{item_name}"
+- "&8{item_price}{shop_currency}"

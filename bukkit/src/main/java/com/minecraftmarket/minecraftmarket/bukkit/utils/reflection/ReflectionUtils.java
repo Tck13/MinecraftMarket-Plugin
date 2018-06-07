@@ -1,8 +1,5 @@
 package com.minecraftmarket.minecraftmarket.bukkit.utils.reflection;
 
-import org.bukkit.Bukkit;
-import org.bukkit.Server;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -10,6 +7,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
+import org.bukkit.Bukkit;
+import org.bukkit.Server;
 
 public class ReflectionUtils {
     private static String preClassB = "org.bukkit.craftbukkit";

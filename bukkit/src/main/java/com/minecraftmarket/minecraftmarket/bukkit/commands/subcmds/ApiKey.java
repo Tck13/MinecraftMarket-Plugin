@@ -1,9 +1,10 @@
 package com.minecraftmarket.minecraftmarket.bukkit.commands.subcmds;
 
+import org.bukkit.command.CommandSender;
+
 import com.minecraftmarket.minecraftmarket.bukkit.MCMarket;
 import com.minecraftmarket.minecraftmarket.bukkit.utils.chat.Colors;
 import com.minecraftmarket.minecraftmarket.common.i18n.I18n;
-import org.bukkit.command.CommandSender;
 
 public class ApiKey extends Cmd {
     private final MCMarket plugin;

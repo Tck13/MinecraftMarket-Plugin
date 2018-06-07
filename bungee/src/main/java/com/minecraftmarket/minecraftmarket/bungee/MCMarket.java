@@ -1,5 +1,10 @@
 package com.minecraftmarket.minecraftmarket.bungee;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.concurrent.TimeUnit;
+
 import com.minecraftmarket.minecraftmarket.bungee.commands.MMCmd;
 import com.minecraftmarket.minecraftmarket.bungee.configs.MainConfig;
 import com.minecraftmarket.minecraftmarket.bungee.tasks.PurchasesTask;
@@ -8,12 +13,8 @@ import com.minecraftmarket.minecraftmarket.common.i18n.I18n;
 import com.minecraftmarket.minecraftmarket.common.stats.BungeeStats;
 import com.minecraftmarket.minecraftmarket.common.updater.UpdateChecker;
 import com.minecraftmarket.minecraftmarket.common.utils.FileUtils;
-import net.md_5.bungee.api.plugin.Plugin;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.util.concurrent.TimeUnit;
+import net.md_5.bungee.api.plugin.Plugin;
 
 public final class MCMarket extends Plugin {
     private I18n i18n;

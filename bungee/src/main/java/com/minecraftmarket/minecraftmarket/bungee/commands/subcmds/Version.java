@@ -4,6 +4,7 @@ import com.minecraftmarket.minecraftmarket.bungee.MCMarket;
 import com.minecraftmarket.minecraftmarket.bungee.utils.chat.Chat;
 import com.minecraftmarket.minecraftmarket.bungee.utils.chat.Colors;
 import com.minecraftmarket.minecraftmarket.common.i18n.I18n;
+
 import net.md_5.bungee.api.CommandSender;
 
 public class Version extends Cmd {

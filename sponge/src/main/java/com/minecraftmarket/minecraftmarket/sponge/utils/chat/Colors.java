@@ -1,13 +1,13 @@
 package com.minecraftmarket.minecraftmarket.sponge.utils.chat;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextStyle;
 import org.spongepowered.api.text.format.TextStyles;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class Colors {
     public static Text color(String msg) {

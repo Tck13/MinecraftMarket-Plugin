@@ -1,10 +1,10 @@
 package com.minecraftmarket.minecraftmarket.nukkit.utils.config;
 
-import cn.nukkit.plugin.PluginBase;
-import cn.nukkit.utils.Config;
-
 import java.io.File;
 import java.io.IOException;
+
+import cn.nukkit.plugin.PluginBase;
+import cn.nukkit.utils.Config;
 
 public abstract class ConfigFile extends File {
     protected final Config config;

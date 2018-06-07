@@ -1,8 +1,8 @@
 package com.minecraftmarket.minecraftmarket.bukkit.tasks;
 
-import com.minecraftmarket.minecraftmarket.bukkit.MCMarket;
-import com.minecraftmarket.minecraftmarket.common.api.MCMarketApi;
-import com.minecraftmarket.minecraftmarket.common.api.models.Command;
+import java.util.Arrays;
+import java.util.List;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -10,8 +10,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.Arrays;
-import java.util.List;
+import com.minecraftmarket.minecraftmarket.bukkit.MCMarket;
+import com.minecraftmarket.minecraftmarket.common.api.MCMarketApi;
+import com.minecraftmarket.minecraftmarket.common.api.models.Command;
 
 public class PurchasesTask implements Runnable {
     private final MCMarket plugin;

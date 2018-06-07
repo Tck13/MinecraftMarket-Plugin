@@ -1,8 +1,8 @@
 package com.minecraftmarket.minecraftmarket.sponge.config;
 
-import com.minecraftmarket.minecraftmarket.sponge.utils.config.ConfigFile;
-
 import java.io.File;
+
+import com.minecraftmarket.minecraftmarket.sponge.utils.config.ConfigFile;
 
 public class MainConfig extends ConfigFile {
     private final String apiKey;

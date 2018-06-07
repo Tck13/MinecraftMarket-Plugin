@@ -1,8 +1,8 @@
 package com.minecraftmarket.minecraftmarket.common.utils;
 
-import org.bukkit.Bukkit;
-
 import java.lang.reflect.Field;
+
+import org.bukkit.Bukkit;
 
 public class TPS {
     private static Object minecraftServer;

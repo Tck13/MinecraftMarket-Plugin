@@ -1,9 +1,9 @@
 package com.minecraftmarket.minecraftmarket.bungee.utils.chat;
 
-import net.md_5.bungee.api.ChatColor;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import net.md_5.bungee.api.ChatColor;
 
 public class Colors {
     public static String color(String msg) {

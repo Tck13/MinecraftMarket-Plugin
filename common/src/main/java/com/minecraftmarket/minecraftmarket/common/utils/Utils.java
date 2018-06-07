@@ -55,6 +55,23 @@ public class Utils {
             return 0;
         }
     }
+    
+    public static boolean isLong(String input) {
+        try {
+        	Long.parseLong(input);
+        } catch (NumberFormatException e) {
+            return false;
+        }
+        return true;
+    }
+    
+    public static long getLong(String input) {
+        try {
+            return Long.parseLong(input);
+        } catch (NumberFormatException e) {
+            return 0;
+        }
+    }
 
     public static int roundDown(int n, int m) {
         return n >= 0 ? (n / m) * m : ((n - m + 1) / m) * m;

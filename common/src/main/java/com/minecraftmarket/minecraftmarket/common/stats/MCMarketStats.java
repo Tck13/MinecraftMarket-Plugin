@@ -1,10 +1,5 @@
 package com.minecraftmarket.minecraftmarket.common.stats;
 
-import com.minecraftmarket.minecraftmarket.common.api.MCMarketApi;
-import com.minecraftmarket.minecraftmarket.common.api.models.PlayerSession;
-import com.minecraftmarket.minecraftmarket.common.api.models.ServerInfo;
-import com.sun.management.OperatingSystemMXBean;
-
 import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -12,6 +7,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+
+import com.minecraftmarket.minecraftmarket.common.api.MCMarketApi;
+import com.minecraftmarket.minecraftmarket.common.api.models.PlayerSession;
+import com.minecraftmarket.minecraftmarket.common.api.models.ServerInfo;
+import com.sun.management.OperatingSystemMXBean;
 
 abstract class MCMarketStats {
     private final MCMarketApi marketApi;

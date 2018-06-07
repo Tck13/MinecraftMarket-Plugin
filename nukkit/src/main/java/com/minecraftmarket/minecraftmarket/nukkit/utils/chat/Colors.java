@@ -1,9 +1,9 @@
 package com.minecraftmarket.minecraftmarket.nukkit.utils.chat;
 
-import cn.nukkit.utils.TextFormat;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import cn.nukkit.utils.TextFormat;
 
 public class Colors {
     public static String color(String msg) {

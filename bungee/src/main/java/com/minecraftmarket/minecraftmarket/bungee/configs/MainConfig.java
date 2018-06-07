@@ -1,6 +1,7 @@
 package com.minecraftmarket.minecraftmarket.bungee.configs;
 
 import com.minecraftmarket.minecraftmarket.bungee.utils.config.ConfigFile;
+
 import net.md_5.bungee.api.plugin.Plugin;
 
 public class MainConfig extends ConfigFile {

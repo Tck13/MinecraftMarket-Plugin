@@ -1,10 +1,11 @@
 package com.minecraftmarket.minecraftmarket.sponge.commands.subcmds;
 
+import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.plugin.Plugin;
+
 import com.minecraftmarket.minecraftmarket.common.i18n.I18n;
 import com.minecraftmarket.minecraftmarket.sponge.MCMarket;
 import com.minecraftmarket.minecraftmarket.sponge.utils.chat.Colors;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.plugin.Plugin;
 
 public class Version extends Cmd {
     private final MCMarket plugin;

@@ -1,9 +1,10 @@
 package com.minecraftmarket.minecraftmarket.bukkit.listeners;
 
-import com.minecraftmarket.minecraftmarket.bukkit.MCMarket;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
+
+import com.minecraftmarket.minecraftmarket.bukkit.MCMarket;
 
 public class ShopCmdListener implements Listener {
     private final MCMarket plugin;

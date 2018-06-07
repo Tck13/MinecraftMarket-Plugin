@@ -1,16 +1,21 @@
 package com.minecraftmarket.minecraftmarket.bungee.commands;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import com.minecraftmarket.minecraftmarket.bungee.MCMarket;
-import com.minecraftmarket.minecraftmarket.bungee.commands.subcmds.*;
+import com.minecraftmarket.minecraftmarket.bungee.commands.subcmds.ApiKey;
+import com.minecraftmarket.minecraftmarket.bungee.commands.subcmds.Check;
+import com.minecraftmarket.minecraftmarket.bungee.commands.subcmds.Cmd;
+import com.minecraftmarket.minecraftmarket.bungee.commands.subcmds.Reload;
+import com.minecraftmarket.minecraftmarket.bungee.commands.subcmds.Version;
 import com.minecraftmarket.minecraftmarket.bungee.utils.chat.Chat;
+
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.api.plugin.TabExecutor;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public class MMCmd extends Command implements TabExecutor {
     private final List<Cmd> subCmds = new ArrayList<>();

@@ -1,17 +1,21 @@
 package com.minecraftmarket.minecraftmarket.nukkit;
 
-import cn.nukkit.command.Command;
-import cn.nukkit.command.CommandSender;
-import cn.nukkit.event.HandlerList;
-import cn.nukkit.plugin.PluginBase;
-import cn.nukkit.scheduler.AsyncTask;
-import cn.nukkit.utils.TextFormat;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import com.minecraftmarket.minecraftmarket.common.api.MCMarketApi;
 import com.minecraftmarket.minecraftmarket.common.i18n.I18n;
 import com.minecraftmarket.minecraftmarket.common.stats.NukkitStats;
 import com.minecraftmarket.minecraftmarket.common.updater.UpdateChecker;
 import com.minecraftmarket.minecraftmarket.common.utils.FileUtils;
-import com.minecraftmarket.minecraftmarket.nukkit.commands.*;
+import com.minecraftmarket.minecraftmarket.nukkit.commands.ApiKey;
+import com.minecraftmarket.minecraftmarket.nukkit.commands.Check;
+import com.minecraftmarket.minecraftmarket.nukkit.commands.Cmd;
+import com.minecraftmarket.minecraftmarket.nukkit.commands.Reload;
+import com.minecraftmarket.minecraftmarket.nukkit.commands.UpdateSigns;
+import com.minecraftmarket.minecraftmarket.nukkit.commands.Version;
 import com.minecraftmarket.minecraftmarket.nukkit.configs.MainConfig;
 import com.minecraftmarket.minecraftmarket.nukkit.configs.SignsConfig;
 import com.minecraftmarket.minecraftmarket.nukkit.configs.SignsLayoutConfig;
@@ -19,10 +23,12 @@ import com.minecraftmarket.minecraftmarket.nukkit.listeners.SignsListener;
 import com.minecraftmarket.minecraftmarket.nukkit.tasks.PurchasesTask;
 import com.minecraftmarket.minecraftmarket.nukkit.tasks.SignsTask;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import cn.nukkit.command.Command;
+import cn.nukkit.command.CommandSender;
+import cn.nukkit.event.HandlerList;
+import cn.nukkit.plugin.PluginBase;
+import cn.nukkit.scheduler.AsyncTask;
+import cn.nukkit.utils.TextFormat;
 
 public final class MCMarket extends PluginBase {
     private final List<Cmd> subCmds = new ArrayList<>();

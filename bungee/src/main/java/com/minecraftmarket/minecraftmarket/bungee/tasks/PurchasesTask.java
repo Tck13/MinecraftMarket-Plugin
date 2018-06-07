@@ -1,14 +1,15 @@
 package com.minecraftmarket.minecraftmarket.bungee.tasks;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
 import com.minecraftmarket.minecraftmarket.bungee.MCMarket;
 import com.minecraftmarket.minecraftmarket.bungee.utils.BungeeRunnable;
 import com.minecraftmarket.minecraftmarket.common.api.MCMarketApi;
 import com.minecraftmarket.minecraftmarket.common.api.models.Command;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 public class PurchasesTask implements Runnable {
     private final MCMarket plugin;

@@ -1,10 +1,10 @@
 package com.minecraftmarket.minecraftmarket.bungee.utils;
 
+import java.util.concurrent.TimeUnit;
+
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.scheduler.ScheduledTask;
-
-import java.util.concurrent.TimeUnit;
 
 public abstract class BungeeRunnable implements Runnable {
     private int taskId = -1;

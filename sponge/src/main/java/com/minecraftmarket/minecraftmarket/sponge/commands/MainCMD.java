@@ -1,17 +1,23 @@
 package com.minecraftmarket.minecraftmarket.sponge.commands;
 
-import com.minecraftmarket.minecraftmarket.sponge.MCMarket;
-import com.minecraftmarket.minecraftmarket.sponge.commands.subcmds.*;
-import com.minecraftmarket.minecraftmarket.sponge.utils.chat.Colors;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import com.minecraftmarket.minecraftmarket.sponge.MCMarket;
+import com.minecraftmarket.minecraftmarket.sponge.commands.subcmds.ApiKey;
+import com.minecraftmarket.minecraftmarket.sponge.commands.subcmds.Check;
+import com.minecraftmarket.minecraftmarket.sponge.commands.subcmds.Cmd;
+import com.minecraftmarket.minecraftmarket.sponge.commands.subcmds.Reload;
+import com.minecraftmarket.minecraftmarket.sponge.commands.subcmds.UpdateSigns;
+import com.minecraftmarket.minecraftmarket.sponge.commands.subcmds.Version;
+import com.minecraftmarket.minecraftmarket.sponge.utils.chat.Colors;
 
 public class MainCMD implements CommandExecutor {
     private final List<Cmd> subCmds = new ArrayList<>();

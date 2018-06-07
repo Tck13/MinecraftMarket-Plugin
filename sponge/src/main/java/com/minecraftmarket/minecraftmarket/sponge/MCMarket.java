@@ -1,18 +1,11 @@
 package com.minecraftmarket.minecraftmarket.sponge;
 
-import com.google.inject.Inject;
-import com.minecraftmarket.minecraftmarket.common.api.MCMarketApi;
-import com.minecraftmarket.minecraftmarket.common.i18n.I18n;
-import com.minecraftmarket.minecraftmarket.common.stats.SpongeStats;
-import com.minecraftmarket.minecraftmarket.common.updater.UpdateChecker;
-import com.minecraftmarket.minecraftmarket.common.utils.FileUtils;
-import com.minecraftmarket.minecraftmarket.sponge.commands.MainCMD;
-import com.minecraftmarket.minecraftmarket.sponge.config.MainConfig;
-import com.minecraftmarket.minecraftmarket.sponge.config.SignsConfig;
-import com.minecraftmarket.minecraftmarket.sponge.config.SignsLayoutConfig;
-import com.minecraftmarket.minecraftmarket.sponge.listeners.SignsListener;
-import com.minecraftmarket.minecraftmarket.sponge.tasks.PurchasesTask;
-import com.minecraftmarket.minecraftmarket.sponge.tasks.SignsTask;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Optional;
+
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.args.GenericArguments;
@@ -27,11 +20,19 @@ import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Optional;
+import com.google.inject.Inject;
+import com.minecraftmarket.minecraftmarket.common.api.MCMarketApi;
+import com.minecraftmarket.minecraftmarket.common.i18n.I18n;
+import com.minecraftmarket.minecraftmarket.common.stats.SpongeStats;
+import com.minecraftmarket.minecraftmarket.common.updater.UpdateChecker;
+import com.minecraftmarket.minecraftmarket.common.utils.FileUtils;
+import com.minecraftmarket.minecraftmarket.sponge.commands.MainCMD;
+import com.minecraftmarket.minecraftmarket.sponge.config.MainConfig;
+import com.minecraftmarket.minecraftmarket.sponge.config.SignsConfig;
+import com.minecraftmarket.minecraftmarket.sponge.config.SignsLayoutConfig;
+import com.minecraftmarket.minecraftmarket.sponge.listeners.SignsListener;
+import com.minecraftmarket.minecraftmarket.sponge.tasks.PurchasesTask;
+import com.minecraftmarket.minecraftmarket.sponge.tasks.SignsTask;
 
 @Plugin(
         id = "minecraftmarket",

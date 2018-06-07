@@ -1,12 +1,12 @@
 package com.minecraftmarket.minecraftmarket.common.stats;
 
-import com.minecraftmarket.minecraftmarket.common.api.MCMarketApi;
-import com.minecraftmarket.minecraftmarket.common.api.models.PlayerSession;
-import com.minecraftmarket.minecraftmarket.common.api.models.ServerInfo;
-import com.minecraftmarket.minecraftmarket.common.api.models.ServerPlayer;
-import com.minecraftmarket.minecraftmarket.common.api.models.ServerPlugin;
-import com.minecraftmarket.minecraftmarket.common.utils.Ping;
-import com.minecraftmarket.minecraftmarket.common.utils.TPS;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Timer;
+import java.util.TimerTask;
+
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -15,12 +15,13 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Timer;
-import java.util.TimerTask;
+import com.minecraftmarket.minecraftmarket.common.api.MCMarketApi;
+import com.minecraftmarket.minecraftmarket.common.api.models.PlayerSession;
+import com.minecraftmarket.minecraftmarket.common.api.models.ServerInfo;
+import com.minecraftmarket.minecraftmarket.common.api.models.ServerPlayer;
+import com.minecraftmarket.minecraftmarket.common.api.models.ServerPlugin;
+import com.minecraftmarket.minecraftmarket.common.utils.Ping;
+import com.minecraftmarket.minecraftmarket.common.utils.TPS;
 
 public class BukkitStats extends MCMarketStats {
     private final JavaPlugin plugin;

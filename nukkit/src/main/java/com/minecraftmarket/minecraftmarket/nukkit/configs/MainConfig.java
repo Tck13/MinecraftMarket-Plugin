@@ -1,7 +1,8 @@
 package com.minecraftmarket.minecraftmarket.nukkit.configs;
 
-import cn.nukkit.plugin.PluginBase;
 import com.minecraftmarket.minecraftmarket.nukkit.utils.config.ConfigFile;
+
+import cn.nukkit.plugin.PluginBase;
 
 public class MainConfig extends ConfigFile {
     private final String apiKey;

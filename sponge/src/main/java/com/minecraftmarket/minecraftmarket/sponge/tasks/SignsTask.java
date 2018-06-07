@@ -1,16 +1,6 @@
 package com.minecraftmarket.minecraftmarket.sponge.tasks;
 
 
-import com.minecraftmarket.minecraftmarket.common.api.models.Purchase;
-import com.minecraftmarket.minecraftmarket.sponge.MCMarket;
-import com.minecraftmarket.minecraftmarket.sponge.config.SignsConfig;
-import com.minecraftmarket.minecraftmarket.sponge.utils.chat.Colors;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.block.tileentity.Sign;
-import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.data.manipulator.mutable.tileentity.SignData;
-import org.spongepowered.api.text.Text;
-
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -18,6 +8,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.block.tileentity.Sign;
+import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.manipulator.mutable.tileentity.SignData;
+import org.spongepowered.api.text.Text;
+
+import com.minecraftmarket.minecraftmarket.common.api.models.Purchase;
+import com.minecraftmarket.minecraftmarket.sponge.MCMarket;
+import com.minecraftmarket.minecraftmarket.sponge.config.SignsConfig;
+import com.minecraftmarket.minecraftmarket.sponge.utils.chat.Colors;
 
 public class SignsTask implements Runnable {
     private final MCMarket plugin;

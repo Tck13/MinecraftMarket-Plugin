@@ -12,6 +12,7 @@ public class Item {
     private final String icon;
     private final String url;
     private final String price;
+    private final String sale_price;
     private final long order;
 
     @JsonCreator
@@ -21,6 +22,7 @@ public class Item {
                 @JsonProperty("gui_icon") String icon,
                 @JsonProperty("gui_url") String url,
                 @JsonProperty("price") String price,
+                @JsonProperty("sale_price") String sale_price,
                 @JsonProperty("order") long order) {
         this.id = id;
         this.name = name;
@@ -28,6 +30,7 @@ public class Item {
         this.icon = icon;
         this.url = url;
         this.price = price;
+        this.sale_price = sale_price;
         this.order = order;
     }
 
@@ -54,7 +57,15 @@ public class Item {
     public String getPrice() {
         return price;
     }
+    
+    public String getSalePrice() {
+        return sale_price;
+    }
 
+    public boolean hasSale(){
+    	return !price.equals(sale_price);
+    }
+    
     public long getOrder() {
         return order;
     }

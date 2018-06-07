@@ -1,8 +1,12 @@
 package com.minecraftmarket.minecraftmarket.bukkit.utils.inventories;
 
-import com.minecraftmarket.minecraftmarket.bukkit.utils.chat.Colors;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -10,12 +14,12 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.HashMap;
-import java.util.Map;
+import com.minecraftmarket.minecraftmarket.bukkit.utils.chat.Colors;
 
-public class InventoryGUI {
+public class InventoryGUI implements InventoryHolder {
     private static final Map<Inventory, InventoryGUI> inventories = new HashMap<>();
     private final Map<Integer, ItemClick> items = new HashMap<>();
     private Inventory inventory;
@@ -30,7 +34,7 @@ public class InventoryGUI {
         if (size < 9) {
             size = 9;
         }
-        this.inventory = Bukkit.createInventory(null, size, Colors.color(name));
+        this.inventory = Bukkit.createInventory(this, size, Colors.color(name));
         this.cancelClick = cancelClick;
         this.listed = false;
     }
@@ -82,7 +86,11 @@ public class InventoryGUI {
     public int getSize() {
         return inventory.getSize();
     }
-
+    
+    public List<HumanEntity> getViewers() {
+    	return inventory.getViewers();
+    }
+    
     public void clear() {
         inventory.clear();
     }
@@ -91,12 +99,12 @@ public class InventoryGUI {
         return new Listener() {
             @EventHandler
             public void onInventoryClickEvent(InventoryClickEvent e) {
-                if (inventories.containsKey(e.getClickedInventory())) {
-                    InventoryGUI current = inventories.get(e.getClickedInventory());
+                if (inventories.containsKey(e.getWhoClicked().getOpenInventory().getTopInventory())) {
+                    InventoryGUI current = inventories.get(e.getWhoClicked().getOpenInventory().getTopInventory());
                     if (current.cancelClick) {
                         e.setCancelled(true);
                     }
-                    if (current.items.containsKey(e.getSlot())) {
+                    if (current.items.containsKey(e.getSlot()) && inventories.containsKey(e.getClickedInventory())) {
                         e.setCancelled(current.items.get(e.getSlot()).onClick((Player) e.getWhoClicked(), e.getSlot(), e.getCurrentItem()));
                     }
                 }
@@ -104,8 +112,8 @@ public class InventoryGUI {
 
             @EventHandler
             public void onInventoryDragEvent(InventoryDragEvent e) {
-                if (inventories.containsKey(e.getInventory())) {
-                    InventoryGUI current = inventories.get(e.getInventory());
+                if (inventories.containsKey(e.getWhoClicked().getOpenInventory().getTopInventory())) {
+                    InventoryGUI current = inventories.get(e.getWhoClicked().getOpenInventory().getTopInventory());
                     if (current.cancelClick) {
                         e.setCancelled(true);
                     }
@@ -149,4 +157,9 @@ public class InventoryGUI {
     public interface ItemClick {
         boolean onClick(Player player, int slot, ItemStack item);
     }
+
+	@Override
+	public Inventory getInventory() {
+		return inventory;
+	}
 }

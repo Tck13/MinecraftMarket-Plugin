@@ -1,11 +1,12 @@
 package com.minecraftmarket.minecraftmarket.sponge.config;
 
-import com.google.common.reflect.TypeToken;
-import com.minecraftmarket.minecraftmarket.sponge.utils.config.ConfigFile;
-import ninja.leaping.configurate.objectmapping.ObjectMappingException;
-
 import java.io.File;
 import java.util.List;
+
+import com.google.common.reflect.TypeToken;
+import com.minecraftmarket.minecraftmarket.sponge.utils.config.ConfigFile;
+
+import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 
 public class SignsLayoutConfig extends ConfigFile {
     private List<String> activeLayout;

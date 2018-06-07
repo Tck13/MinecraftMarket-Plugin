@@ -1,9 +1,9 @@
 package com.minecraftmarket.minecraftmarket.common.utils;
 
-import org.bukkit.entity.Player;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+
+import org.bukkit.entity.Player;
 
 public class Ping {
     private static Method getHandleMethod;

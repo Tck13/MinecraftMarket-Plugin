@@ -1,10 +1,17 @@
 package com.minecraftmarket.minecraftmarket.common.stats;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
+
 import com.minecraftmarket.minecraftmarket.common.api.MCMarketApi;
 import com.minecraftmarket.minecraftmarket.common.api.models.PlayerSession;
 import com.minecraftmarket.minecraftmarket.common.api.models.ServerInfo;
 import com.minecraftmarket.minecraftmarket.common.api.models.ServerPlayer;
 import com.minecraftmarket.minecraftmarket.common.api.models.ServerPlugin;
+
 import net.md_5.bungee.api.config.ListenerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PlayerDisconnectEvent;
@@ -12,12 +19,6 @@ import net.md_5.bungee.api.event.ServerConnectEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.event.EventHandler;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 public class BungeeStats extends MCMarketStats {
     private final Plugin plugin;

@@ -1,9 +1,9 @@
 package com.minecraftmarket.minecraftmarket.bungee.commands.subcmds;
 
-import net.md_5.bungee.api.CommandSender;
-
 import java.util.Collections;
 import java.util.List;
+
+import net.md_5.bungee.api.CommandSender;
 
 public abstract class Cmd {
     private final String command;

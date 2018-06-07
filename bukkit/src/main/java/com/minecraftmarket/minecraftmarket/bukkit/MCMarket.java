@@ -1,5 +1,10 @@
 package com.minecraftmarket.minecraftmarket.bukkit;
 
+import java.io.File;
+
+import org.bukkit.event.HandlerList;
+import org.bukkit.plugin.java.JavaPlugin;
+
 import com.minecraftmarket.minecraftmarket.bukkit.commands.MMCmd;
 import com.minecraftmarket.minecraftmarket.bukkit.commands.MMGui;
 import com.minecraftmarket.minecraftmarket.bukkit.configs.GUILayoutConfig;
@@ -9,6 +14,7 @@ import com.minecraftmarket.minecraftmarket.bukkit.configs.SignsLayoutConfig;
 import com.minecraftmarket.minecraftmarket.bukkit.inventory.InventoryManager;
 import com.minecraftmarket.minecraftmarket.bukkit.listeners.ShopCmdListener;
 import com.minecraftmarket.minecraftmarket.bukkit.listeners.SignsListener;
+import com.minecraftmarket.minecraftmarket.bukkit.tasks.GUIupdateTask;
 import com.minecraftmarket.minecraftmarket.bukkit.tasks.PurchasesTask;
 import com.minecraftmarket.minecraftmarket.bukkit.tasks.SignsTask;
 import com.minecraftmarket.minecraftmarket.bukkit.utils.inventories.InventoryGUI;
@@ -17,10 +23,6 @@ import com.minecraftmarket.minecraftmarket.common.i18n.I18n;
 import com.minecraftmarket.minecraftmarket.common.stats.BukkitStats;
 import com.minecraftmarket.minecraftmarket.common.updater.UpdateChecker;
 import com.minecraftmarket.minecraftmarket.common.utils.FileUtils;
-import org.bukkit.event.HandlerList;
-import org.bukkit.plugin.java.JavaPlugin;
-
-import java.io.File;
 
 public final class MCMarket extends JavaPlugin {
     private I18n i18n;
@@ -33,7 +35,8 @@ public final class MCMarket extends JavaPlugin {
     private InventoryManager inventoryManager;
     private SignsTask signsTask;
     private PurchasesTask purchasesTask;
-
+    private GUIupdateTask GUIupdateTask;
+    
     @Override
     public void onEnable() {
         i18n = new I18n(getLanguageFolder(), getLogger());
@@ -51,7 +54,7 @@ public final class MCMarket extends JavaPlugin {
     }
 
     @Override
-    public void onDisable() {
+    public void onDisable() { 	
         HandlerList.unregisterAll(this);
         getServer().getScheduler().cancelTasks(this);
         i18n.onDisable();
@@ -70,13 +73,17 @@ public final class MCMarket extends JavaPlugin {
 
         setKey(mainConfig.getApiKey(), false, result -> {
             if (mainConfig.isUseGUI()) {
-                if (inventoryManager == null) {
-                    inventoryManager = new InventoryManager(this);
-                }
                 getServer().getPluginManager().registerEvents(new ShopCmdListener(this), this);
-                getServer().getPluginManager().registerEvents(InventoryGUI.getListener(), this);
             }
-
+            if (inventoryManager == null) {
+                inventoryManager = new InventoryManager(this);
+            }
+            if (GUIupdateTask == null) {
+            	GUIupdateTask = new GUIupdateTask(this);
+            }
+            getServer().getScheduler().runTaskTimer(this, GUIupdateTask, 20 * 10, mainConfig.getCheckInterval() > 0 ? 20 * 60 * mainConfig.getCheckInterval() : 20 * 60);
+            getServer().getPluginManager().registerEvents(InventoryGUI.getListener(), this);
+            
             if (mainConfig.isUseSigns()) {
                 if (signsTask == null) {
                     signsTask = new SignsTask(this);
