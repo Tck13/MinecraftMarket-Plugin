@@ -6,12 +6,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import com.google.common.collect.ImmutableList;
 import com.minecraftmarket.minecraftmarket.bukkit.MCMarket;
 import com.minecraftmarket.minecraftmarket.bukkit.configs.GUILayoutConfig;
 import com.minecraftmarket.minecraftmarket.bukkit.utils.chat.Colors;
@@ -35,8 +38,8 @@ public class InventoryManager {
 	private ItemStack nextPageItem;
 	private Market market;
 	private List<String> exist;
-	
-    public HashMap<UUID, Block> buySignSetup = new HashMap<>();
+
+	public HashMap<UUID, Block> buySignSetup = new HashMap<>();
 
 	public InventoryManager(MCMarket plugin) {
 		this.mainInventories = new ArrayList<>();
@@ -88,7 +91,13 @@ public class InventoryManager {
 				int invs = Utils.roundUp(categories.size(), size) / size;
 
 				for (int i = 1; i <= invs; i++) {
-					InventoryGUI inventory = mainInventories.size() >= i ? mainInventories.get((i - 1)) : new InventoryGUI(guiLayoutConfig.getCategoryListTile(), size + 9, true);
+					InventoryGUI inventory = mainInventories.size() >= i ? mainInventories.get((i - 1)) : new InventoryGUI(replaceVars(guiLayoutConfig.getCategoryListTile(), null, null), size + 9, true);
+
+					boolean needResize = false;
+					if ((inventory.getSize()-9) / 9 != guiLayoutConfig.getGuiRows()) {
+						inventory = new InventoryGUI(replaceVars(guiLayoutConfig.getCategoryListTile(), null, null), size + 9, true);
+						needResize = true;
+					}
 
 					for (int pos = (size * i) - size; pos < categories.size() && pos < size * i; pos++) {
 						Category category = categories.get(pos);
@@ -99,10 +108,10 @@ public class InventoryManager {
 						});
 					}
 
-					for(int b = categories.size(); b < size; b++){
+					for (int b = categories.size(); b < size; b++) {
 						inventory.setItem(b, null);
 					}
-					
+
 					if (i > 1) {
 						int invNr = i - 1;
 						inventory.setItem(size, previousPageItem, (player, slot, item) -> {
@@ -121,7 +130,15 @@ public class InventoryManager {
 
 					if (mainInventories.size() >= i) {
 						// page already exist needs update
-						inventory.getViewers().forEach(player -> ((Player) player).updateInventory());
+						if (needResize) {
+							for (HumanEntity entity : ImmutableList.copyOf(mainInventories.get((i - 1)).getViewers())) {
+								((Player) entity).closeInventory();
+								inventory.open(((Player) entity));
+							}
+							mainInventories.add(i - 1, inventory);
+						} else {
+							ImmutableList.copyOf(inventory.getViewers()).forEach(entity -> ((Player) entity).updateInventory());
+						}
 					} else {
 						// page is new, need to be added
 						mainInventories.add(i - 1, inventory);
@@ -131,40 +148,40 @@ public class InventoryManager {
 				for (int i = 0; i < mainInventories.size(); i++) {
 					if (i >= invs) {
 						// main inventory no longer exist
-						mainInventories.get(i).getViewers().forEach(player -> {
-							((Player) player).closeInventory();
-							open((Player) player);
+						ImmutableList.copyOf(mainInventories.get(i).getViewers()).forEach(entity -> {
+							((Player) entity).closeInventory();
+							open((Player) entity);
 						});
 						mainInventories.remove(i);
 					}
 				}
-				
+
 				List<String> toRemove = new ArrayList<>(inventories.keySet());
 				toRemove.removeAll(exist);
 				for (int i = 0; i < toRemove.size(); i++) {
 					String key = (String) toRemove.get(i);
-					inventories.get(key).getViewers().forEach(player -> {
-						((Player) player).closeInventory();
-						open((Player) player);
+					ImmutableList.copyOf(inventories.get(key).getViewers()).forEach(entity -> {
+						((Player) entity).closeInventory();
+						open((Player) entity);
 					});
 					inventories.remove(key);
 				}
-				inventories.values().forEach(i -> i.getViewers().stream().forEach(player -> {
+				inventories.values().forEach(i -> ImmutableList.copyOf(i.getViewers()).forEach(player -> {
 					((Player) player).updateInventory();
-				}));				
+				}));
 			} else {
 				if (mainInventories != null && mainInventories.size() != 0) {
-					mainInventories.forEach(i -> i.getViewers().stream().forEach(player -> {
-						player.closeInventory();
-						player.sendMessage(Colors.color(I18n.tl("prefix") + " " + I18n.tl("cmd_auth_key")));
+					mainInventories.forEach(i -> ImmutableList.copyOf(i.getViewers()).forEach(entity -> {
+						entity.closeInventory();
+						entity.sendMessage(Colors.color(I18n.tl("prefix") + " " + I18n.tl("cmd_auth_key")));
 					}));
 					mainInventories.clear();
 				}
 
 				if (inventories != null && inventories.size() != 0) {
-					inventories.values().forEach(i -> i.getViewers().stream().forEach(player -> {
-						player.closeInventory();
-						player.sendMessage(Colors.color(I18n.tl("prefix") + " " + I18n.tl("cmd_auth_key")));
+					inventories.values().forEach(i -> ImmutableList.copyOf(i.getViewers()).forEach(entity -> {
+						entity.closeInventory();
+						entity.sendMessage(Colors.color(I18n.tl("prefix") + " " + I18n.tl("cmd_auth_key")));
 					}));
 					inventories.clear();
 				}
@@ -185,10 +202,10 @@ public class InventoryManager {
 		});
 	}
 
-	public boolean isloading(){
+	public boolean isloading() {
 		return !(mainInventories.size() > 0);
 	}
-	
+
 	public void open(Player player) {
 		if (MCMarket.isAuthenticated()) {
 			if (isloading()) {
@@ -207,106 +224,87 @@ public class InventoryManager {
 		int size = Math.max(guiLayoutConfig.getGuiRows() * 9, 9);
 
 		int totalSlots = category.getSubCategories().size() > 0 ? Utils.roundUp(category.getSubCategories().size(), 9) + category.getItems().size() : category.getItems().size();
-		int invs = Utils.roundUp(totalSlots, size) / size;
+		int invs = Math.max(Utils.roundUp(totalSlots, size) / size, 1);
 
-		if (invs > 0) {
-			for (int i = 1; i <= invs; i++) {
-				InventoryGUI inventory = inventories.get(category.getId() + "|" + i) != null ? inventories.get(category.getId() + "|" + i) : new InventoryGUI(replaceVars(guiLayoutConfig.getItemListTile(), category, null), size + 9, true);
-				exist.add(category.getId() + "|" + i);
-				
-				for (int pos = (size * i) - size; pos < totalSlots && pos < size * i; pos++) {
-					if (category.getSubCategories().size() > 0 && pos < Utils.roundUp(category.getSubCategories().size(), 9)) {
-						if (pos < category.getSubCategories().size()) {
-							Category subCategory = category.getSubCategories().get(pos);
-							inventory.setItem(pos, createCategoryInv(subCategory, category.getId() + "|" + i),
-									(player, slot, item) -> {
-										inventories.get(subCategory.getId() + "|1").open(player);
-										return true;
-									});
-						}
-						continue;
+		for (int i = 1; i <= invs; i++) {
+			InventoryGUI inventory = inventories.get(category.getId() + "|" + i) != null ? inventories.get(category.getId() + "|" + i) : new InventoryGUI(replaceVars(guiLayoutConfig.getItemListTile(), category, null), size + 9, true);
+			exist.add(category.getId() + "|" + i);
+
+			boolean needResize = false;
+			if ((inventory.getSize()-9) / 9 != guiLayoutConfig.getGuiRows()) {
+				inventory = new InventoryGUI(replaceVars(guiLayoutConfig.getItemListTile(), category, null), size + 9, true);
+				needResize = true;
+			}
+			
+			for (int pos = (size * i) - size; pos < totalSlots && pos < size * i; pos++) {
+				if (category.getSubCategories().size() > 0
+						&& pos < Utils.roundUp(category.getSubCategories().size(), 9)) {
+					if (pos < category.getSubCategories().size()) {
+						Category subCategory = category.getSubCategories().get(pos);
+						inventory.setItem(pos, createCategoryInv(subCategory, category.getId() + "|" + i),
+								(player, slot, item) -> {
+									inventories.get(subCategory.getId() + "|1").open(player);
+									return true;
+								});
 					}
-
-					int itemPos = pos;
-					int itemSlot = pos;
-					if (category.getSubCategories().size() > 0) {
-						itemPos = pos - Utils.roundUp(category.getSubCategories().size(), 9);
-						if (i > (Utils.roundUp(Utils.roundUp(category.getSubCategories().size(), 9), size) / size)) {
-							itemSlot = pos - ((i - 1) * size);
-						}
-					}
-
-					Item item = category.getItems().get(itemPos);
-					ItemStackBuilder itemIcon = getItemFromString(item.getIcon());
-					if (itemIcon == null)
-						itemIcon = new ItemStackBuilder(Material.CHEST);
-					itemIcon.withName(replaceVars(guiLayoutConfig.getItemName(), category, item));
-					for (String lines : guiLayoutConfig.getItemLore()) {
-						for (String line : replaceVars(lines, category, item).split("\r\n")) {
-							itemIcon.withLore(line);
-						}
-					}
-
-					inventory.setItem(itemSlot, itemIcon.build(), (player, slot, itemStack) -> {
-						if(buySignSetup.containsKey(player.getUniqueId())){
-							if (plugin.getSignsConfig().addBuySign(item.getUrl(), buySignSetup.get(player.getUniqueId()))) {
-								player.sendMessage(Colors.color(I18n.tl("prefix") + " " + I18n.tl("sign_added")));
-								plugin.getSignsTask().updateSigns();
-								buySignSetup.remove(player.getUniqueId());
-							}
-						} else {
-							player.sendMessage(Colors.color(I18n.tl("prefix") + " " + I18n.tl("gui_item_url", item.getUrl())));
-						}
-						player.closeInventory();
-						return true;
-					});
-				}
-				
-				for(int b = totalSlots; b < size; b++){
-					inventory.setItem(b, null);
+					continue;
 				}
 
-				if (i > 1) {
-					int invNr = i - 1;
-					inventory.setItem(size, previousPageItem, (player, slot, item) -> {
-						inventories.get(category.getId() + "|" + invNr).open(player);
-						return true;
-					});
-				}
-
-				if (i != invs) {
-					int invNr = i + 1;
-					inventory.setItem(size + 8, nextPageItem, (player, slot, item) -> {
-						inventories.get(category.getId() + "|" + invNr).open(player);
-						return true;
-					});
-				}
-
-				for (int pos = size; pos < size + 9; pos++) {
-					if (inventory.getItem(pos) == null) {
-						inventory.setItem(pos, fillItem);
+				int itemPos = pos;
+				int itemSlot = pos;
+				if (category.getSubCategories().size() > 0) {
+					itemPos = pos - Utils.roundUp(category.getSubCategories().size(), 9);
+					if (i > (Utils.roundUp(Utils.roundUp(category.getSubCategories().size(), 9), size) / size)) {
+						itemSlot = pos - ((i - 1) * size);
 					}
 				}
 
-				inventory.setItem(size + 4, backItem, (player, slot, item) -> {
-					if (parent != null) {
-						inventories.get(parent).open(player);
+				Item item = category.getItems().get(itemPos);
+				ItemStackBuilder itemIcon = getItemFromString(item.getIcon());
+				if (itemIcon == null)
+					itemIcon = new ItemStackBuilder(Material.CHEST);
+				itemIcon.withName(replaceVars(guiLayoutConfig.getItemName(), category, item));
+				for (String lines : guiLayoutConfig.getItemLore()) {
+					for (String line : replaceVars(lines, category, item).split("\r\n")) {
+						itemIcon.withLore(line);
+					}
+				}
+
+				inventory.setItem(itemSlot, itemIcon.build(), (player, slot, itemStack) -> {
+					if (buySignSetup.containsKey(player.getUniqueId())) {
+						if (plugin.getSignsConfig().addBuySign(item.getUrl(), buySignSetup.get(player.getUniqueId()))) {
+							player.sendMessage(Colors.color(I18n.tl("prefix") + " " + I18n.tl("sign_added")));
+							plugin.getSignsTask().updateSigns();
+							buySignSetup.remove(player.getUniqueId());
+						}
 					} else {
-						open(player);
+						player.sendMessage(Colors.color(I18n.tl("prefix") + " " + I18n.tl("gui_item_url", item.getUrl())));
 					}
+					player.closeInventory();
 					return true;
 				});
-
-				inventories.put(category.getId() + "|" + i, inventory);
 			}
-		} else {
-			InventoryGUI inventory = inventories.get(category.getId() + "|1") != null ? inventories.get(category.getId() + "|1") : new InventoryGUI(replaceVars(guiLayoutConfig.getItemListTile(), category, null), size + 9, true);
-			exist.add(category.getId() + "|1");
-			
-			for(int b = totalSlots; b < size; b++){
+
+			for (int b = totalSlots; b < size; b++) {
 				inventory.setItem(b, null);
 			}
-			
+
+			if (i > 1) {
+				int invNr = i - 1;
+				inventory.setItem(size, previousPageItem, (player, slot, item) -> {
+					inventories.get(category.getId() + "|" + invNr).open(player);
+					return true;
+				});
+			}
+
+			if (i != invs) {
+				int invNr = i + 1;
+				inventory.setItem(size + 8, nextPageItem, (player, slot, item) -> {
+					inventories.get(category.getId() + "|" + invNr).open(player);
+					return true;
+				});
+			}
+
 			for (int pos = size; pos < size + 9; pos++) {
 				if (inventory.getItem(pos) == null) {
 					inventory.setItem(pos, fillItem);
@@ -321,7 +319,19 @@ public class InventoryManager {
 				}
 				return true;
 			});
-			inventories.put(category.getId() + "|1", inventory);
+
+			if (needResize) {
+				// page already exist needs resize
+				if(needResize) {
+					for (HumanEntity entity : ImmutableList.copyOf(inventories.get(category.getId() + "|" + i).getViewers())) {
+						((Player) entity).closeInventory();
+						inventory.open(((Player) entity));
+			        }
+					inventories.put(category.getId() + "|" + i, inventory);
+				}
+			} else {
+				inventories.put(category.getId() + "|" + i, inventory);
+			}
 		}
 
 		ItemStackBuilder catItem = getItemFromString(category.getIcon());
