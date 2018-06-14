@@ -1,6 +1,7 @@
 name: ${project.parent.name}
 version: ${project.parent.version}
 main: ${project.groupId}.minecraftmarket.${project.artifactId}.MCMarket
-author: [Tck13, R4G3_BABY]
+author: Tck13
+authors: [Tck13, R4G3_BABY]
 description: "${project.parent.description}"
 website: ${project.parent.url}
